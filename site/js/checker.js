@@ -48,13 +48,13 @@ export function createRunner(spawn = () => new Worker(new URL('./py-worker.js', 
       stop();
       return { error: e.message, output: '' };
     }
-    const { error, fatal, unavailable, output = '' } = done;
+    const { error, fatal, unavailable, output = '', image } = done;
     if (unavailable) {
       stop();
       throw new Error(cut(`Could not load ${unavailable}`)); // not the student's mistake: reported as "not checked"
     }
     if (fatal) stop();
-    return { error: cut(error), output };
+    return { error: cut(error), output, ...(image ? { image } : {}) };
   }
 
   const output = code => {
@@ -71,9 +71,10 @@ export async function runCode(item, source, runner) {
   let done;
   try { done = await runner.output(`${item.data[0].before}
 ${source}`); } catch { return NOT_RUN; }
-  const { error, output } = done;
+  const { error, output, image } = done;
   if (error === 'Timeout') return TOO_LONG;
   if (error) return T(output + error, output + error);
+  if (image) return { ...T(output, output), image };
   return output ? T(output, output) : SILENT;
 }
 

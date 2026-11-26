@@ -24,6 +24,6 @@ export const LESSONS = [
   L(20, 'Pandas(Grouping)', 'Pandas (guruhlash)', 'lesson-20'),
   L(21, 'Practice', 'Amaliyot'),
   L(22, 'Pandas(Combining Objects)', 'Pandas (obyektlarni birlashtirish)', 'lesson-22'),
-  L(23, 'Matplotlib(NumPy+pandas)', 'Matplotlib (NumPy + pandas)'),
+  L(23, 'Matplotlib(NumPy+pandas)', 'Matplotlib (NumPy + pandas)', 'lesson-23'),
   L(24, 'Overall Practice', 'Umumiy amaliyot'),
 ];

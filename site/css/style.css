@@ -139,6 +139,8 @@ blockquote { margin: 8px 0; padding: 12px 14px; border-radius: 6px; background: 
 html.theme-fade, html.theme-fade * { transition: background-color .45s ease, border-color .45s ease, color .45s ease !important; }
 
 .out { margin: 8px 0; max-height: 200px; overflow: auto; }
+.out:has(.chart) { max-height: none; }
+.chart { display: block; max-width: 100%; height: auto; background: #ffffff; border-radius: 6px; }
 
 /* Lesson page on wide screens: the question beside the drawing */
 @media (min-width: 900px) {

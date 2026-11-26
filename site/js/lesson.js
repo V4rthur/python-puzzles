@@ -137,7 +137,11 @@ async function start() {
         if (!source.trim()) return void tx(out, UI.empty);
         checks.forEach(b => { b.disabled = true; });
         tx(out, UI.running);
-        try { tx(out, await runCode(q, source, runner)); } finally { checks.forEach(b => { b.disabled = false; }); }
+        try {
+          const shown = await runCode(q, source, runner);
+          tx(out, shown);
+          if (shown.image) out.append(el('img', { src: `data:image/png;base64,${shown.image}`, alt: 'Your chart / Diagrammangiz', className: 'chart' }));
+        } finally { checks.forEach(b => { b.disabled = false; }); }
       };
       field.addEventListener('input', () => { out.hidden = true; });
       row.append(run);

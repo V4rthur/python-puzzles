@@ -6,7 +6,7 @@ const BASE = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
   importScripts(BASE + 'pyodide.js');
   const py = await loadPyodide();
   // Printed text of the current program, capped so a printing loop cannot fill memory.
-  let output = '', decoder;
+  let output = '', decoder = new TextDecoder(); // libraries may print while they load, before any program
   py.setStdout({ write: bytes => {
     if (output.length < 2000) output = (output + decoder.decode(bytes, { stream: true })).slice(0, 2000);
     return bytes.length;

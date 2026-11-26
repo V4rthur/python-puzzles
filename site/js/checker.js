@@ -19,10 +19,13 @@ export function createRunner(spawn = () => new Worker(new URL('./py-worker.js', 
   const stop = () => { worker.terminate(); worker = null; };
   // The worker's answer to run `id` (0: loading). Replies with any other id are ignored.
   const reply = (id, ms) => new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('Timeout')), ms);
+    const limit = time => setTimeout(() => reject(new Error('Timeout')), time);
+    let timer = limit(ms);
     worker.onmessage = ({ data }) => {
       if (data?.id !== id) return;
       clearTimeout(timer);
+      // Libraries are downloaded before the program starts: that wait has the longer limit.
+      if ('loading' in data) return void (timer = limit(data.loading ? LOAD_MS : RUN_MS));
       resolve(data);
     };
     worker.onerror = e => { clearTimeout(timer); reject(new Error(cut(e.message || 'Python stopped'))); };
@@ -36,16 +39,22 @@ export function createRunner(spawn = () => new Worker(new URL('./py-worker.js', 
         if (failed) throw new Error(cut(failed));
       } catch (e) { stop(); throw e; }
     }
+    let done;
     try {
       const id = ++runs, answer = reply(id, RUN_MS);
       worker.postMessage({ id, code });
-      const { error, fatal, output = '' } = await answer;
-      if (fatal) stop();
-      return { error: cut(error), output };
+      done = await answer;
     } catch (e) {
       stop();
       return { error: e.message, output: '' };
     }
+    const { error, fatal, unavailable, output = '' } = done;
+    if (unavailable) {
+      stop();
+      throw new Error(cut(`Could not load ${unavailable}`)); // not the student's mistake: reported as "not checked"
+    }
+    if (fatal) stop();
+    return { error: cut(error), output };
   }
 
   const output = code => {

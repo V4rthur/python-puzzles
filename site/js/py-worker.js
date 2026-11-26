@@ -1,4 +1,5 @@
 // Worker for createRunner (checker.js): posts {id: 0, ready} or {id: 0, failed}, then answers each {id, code} with {id, error, fatal, output}.
+// A program that imports a data library first gets {id, loading}, or {id, unavailable} if the library cannot be fetched.
 const BASE = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
 
 (async () => {
@@ -11,7 +12,28 @@ const BASE = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
     return bytes.length;
   } });
   const flush = () => { try { py.runPython('import sys; sys.stdout.flush()'); } catch {} };
-  onmessage = ({ data: { id, code } }) => {
+  // Downloaded and imported once, outside the program's time limit.
+  const ready = new Set();
+  const prepare = async (id, code) => {
+    const needed = ['sqlite3', 'numpy', 'pandas'].filter(name => !ready.has(name) &&
+      new RegExp(`^\\s*(import|from)\\s+${name}\\b`, 'm').test(code));
+    if (!needed.length) return true;
+    postMessage({ id, loading: true });
+    for (const name of needed) {
+      try {
+        await py.loadPackage(name);
+        py.runPython(`import ${name}`);
+        ready.add(name);
+      } catch {
+        postMessage({ id, unavailable: name });
+        return false;
+      }
+    }
+    postMessage({ id, loading: false });
+    return true;
+  };
+  onmessage = async ({ data: { id, code } }) => {
+    if (!await prepare(id, code)) return;
     let globals;
     output = '';
     decoder = new TextDecoder();

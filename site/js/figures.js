@@ -34,6 +34,12 @@ const word = (text, y, left = 40) => [...text].map((char, i) => tile(char, left 
 // Blocks in a grid, rising in turn. `cells`: [x, y, height] on a 34-unit floor.
 const blocks = (view, cells) => canvas(view, ...cells.map(([x, y, h], i) => wave(move(box(26, 26, h), x * 34, y * 34, 0), i)));
 const COVERS = {
+  'lesson-16': () => canvas('-110 -120 220 200', ...[0, 1, 2].map(i => wave(move(box(80, 80, 22), -40, -40, i * 34), i))),
+  'lesson-17': () => blocks('-110 -100 240 210', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, 16]))),
+  'lesson-18': () => blocks('-120 -90 240 200', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, y ? 8 : 30]))),
+  'lesson-19': () => blocks('-120 -100 240 210', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, (x + y) % 3 ? 6 : 40]))),
+  'lesson-20': () => blocks('-130 -110 250 220', [[0, 0, 50], [0, 1, 40], [2, 0, 24], [2, 1, 18], [4, 0, 62], [4, 1, 54]]),
+  'lesson-22': () => blocks('-130 -90 250 200', [[0, 0, 20], [0, 1, 20], [1, 0, 20], [1, 1, 20], [3, 0, 34], [3, 1, 34], [4, 0, 34], [4, 1, 34]]),
   'lesson-08': () => blocks('-110 -90 240 200', [[0, 1, 12], [1, 1, 28], [2, 1, 52], [3, 1, 28], [4, 1, 12]]),
   'lesson-09': () => blocks('-110 -80 240 190', [[0, 0, 30], [1, 0, 30], [2, 0, 6], [3, 0, 30], [0, 1, 30], [1, 1, 6], [2, 1, 30], [3, 1, 30]]),
   'lesson-10': () => blocks('-120 -90 240 200', [0, 2, 4].flatMap(x => [[x, 0, 18], [x, 1, 34]])),
@@ -79,6 +85,41 @@ export function tower(quiz, done, drop) {
 
 // Each picture uses the values shown in its question, so it is only revealed after an answer.
 export const EXPLAIN = {
+  query() { // WHERE year > 2000
+    const tiles = word(['2001', '1999', '2010'], 70, 70).map((t, i) => { place(t, 70 + i * 80, 70); return t; });
+    later(700, () => { lit(tiles[0]); lit(tiles[2]); tiles[1].style.opacity = .3; place(tiles[1], 150, 110); });
+    return canvas('0 0 300 150', ...tiles);
+  },
+  mask() { // a[a > 6]
+    const tiles = word(['5', '12', '7'], 55, 100);
+    const flags = ['F', 'T', 'T'].map((f, i) => label(100 + i * 46, 105, f));
+    flags.forEach(f => { f.style.opacity = 0; });
+    later(600, () => flags.forEach(f => { f.style.opacity = 1; }));
+    later(1500, () => { [1, 2].forEach(i => { lit(tiles[i]); place(tiles[i], 100 + (i - 1) * 46, 150); }); tiles[0].style.opacity = .35; });
+    return canvas('0 0 280 185', ...tiles, ...flags);
+  },
+  newcolumn() { // df["passed"] = df["score"] >= 65
+    const scores = [70, 95, 60].map((v, i) => tile(String(v), 80, 40 + i * 48));
+    const passed = ['T', 'T', 'F'].map((v, i) => tile(v, 200, 40 + i * 48));
+    passed.forEach((t, i) => { t.style.opacity = 0; later(500 + i * 500, () => { t.style.opacity = 1; if (i < 2) lit(t); }); });
+    return canvas('0 0 280 180', ...scores, ...passed);
+  },
+  slices() { // loc[0:1] and iloc[0:1]
+    const loc = word(['0', '1', '2'], 55, 130), iloc = word(['0', '1', '2'], 130, 130);
+    later(700, () => { lit(loc[0]); lit(loc[1]); });
+    later(1500, () => lit(iloc[0]));
+    return canvas('0 0 290 170', ...loc, ...iloc, label(55, 60, 'loc'), label(55, 135, 'iloc'));
+  },
+  groups() { // shop B: 2 + 4 + 1
+    const values = ['3', '5', '2', '4', '1'], tiles = word(values, 55, 50);
+    later(700, () => tiles.forEach((t, i) => { place(t, i < 2 ? 40 + i * 46 : 170 + (i - 2) * 46, 90); if (i > 1) lit(t); }));
+    return canvas('0 0 300 170', ...tiles, label(63, 140, 'A'), label(216, 140, 'B = 7'));
+  },
+  merge() { // inner merge on id
+    const a = word(['1', '2'], 45, 70), b = word(['2', '3'], 140, 140);
+    later(800, () => { place(a[1], 128, 92); place(b[0], 128, 92); lit(a[1]); lit(b[0]); a[0].style.opacity = .3; b[1].style.opacity = .3; });
+    return canvas('0 0 260 180', ...a, ...b, label(200, 50, 'a'), label(80, 145, 'b'));
+  },
   scope() { // a local x lives only inside the function
     const outer = tile('5', 80, 80), inner = tile('10', 200, 80);
     inner.style.opacity = 0;

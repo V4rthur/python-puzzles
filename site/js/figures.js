@@ -34,6 +34,9 @@ const word = (text, y, left = 40) => [...text].map((char, i) => tile(char, left 
 // Blocks in a grid, rising in turn. `cells`: [x, y, height] on a 34-unit floor.
 const blocks = (view, cells) => canvas(view, ...cells.map(([x, y, h], i) => wave(move(box(26, 26, h), x * 34, y * 34, 0), i)));
 const COVERS = {
+  'review-8-11': () => blocks('-120 -100 240 210', [0, 1, 2].flatMap(x => [0, 1, 2].map(y => [x, y, x === y ? 44 : 10]))),
+  'review-13-20': () => blocks('-130 -110 250 220', [[0, 0, 18], [1, 0, 32], [2, 0, 46], [3, 0, 60], [0, 2, 60], [1, 2, 46], [2, 2, 32], [3, 2, 18]]),
+  'review-all': () => canvas('-110 -150 220 240', ...[0, 1, 2, 3].map(i => { const w = 100 - i * 22; return wave(move(box(w, w, 24), -w / 2, -w / 2, i * 28), i); })),
   'lesson-23': () => blocks('-120 -120 240 230', [[0, 1, 22], [1, 1, 48], [2, 1, 34], [3, 1, 74], [4, 1, 56]]),
   'lesson-14': () => blocks('-130 -100 250 210', [[0, 0, 56], [0, 1, 40], [2, 0, 8], [3, 0, 8], [5, 0, 40], [5, 1, 56]]),
   'lesson-15': () => blocks('-120 -100 240 210', [[1, 0, 58], [0, 1, 34], [2, 1, 34], [0, 3, 12], [1, 3, 12], [2, 3, 12], [3, 3, 12]]),

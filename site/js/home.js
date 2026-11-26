@@ -75,7 +75,7 @@ function lessonList(student, loaded) {
     el('p', { className: 'who' }, el('strong', { textContent: student.name }), ` · ${student.code} `, out),
     tx(el('p', { className: 'progress' }), T(`${done} of ${total} done`, `${total} tadan ${done} tasi bajarildi`)),
     bar,
-    covers, tx(el('h2'), T('Coming soon', 'Tez orada')), soon);
+    covers, ...(soon.childElementCount ? [tx(el('h2'), T('Coming soon', 'Tez orada')), soon] : []));
 }
 
 async function render() {

@@ -34,6 +34,8 @@ const word = (text, y, left = 40) => [...text].map((char, i) => tile(char, left 
 // Blocks in a grid, rising in turn. `cells`: [x, y, height] on a 34-unit floor.
 const blocks = (view, cells) => canvas(view, ...cells.map(([x, y, h], i) => wave(move(box(26, 26, h), x * 34, y * 34, 0), i)));
 const COVERS = {
+  'lesson-14': () => blocks('-130 -100 250 210', [[0, 0, 56], [0, 1, 40], [2, 0, 8], [3, 0, 8], [5, 0, 40], [5, 1, 56]]),
+  'lesson-15': () => blocks('-120 -100 240 210', [[1, 0, 58], [0, 1, 34], [2, 1, 34], [0, 3, 12], [1, 3, 12], [2, 3, 12], [3, 3, 12]]),
   'lesson-16': () => canvas('-110 -120 220 200', ...[0, 1, 2].map(i => wave(move(box(80, 80, 22), -40, -40, i * 34), i))),
   'lesson-17': () => blocks('-110 -100 240 210', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, 16]))),
   'lesson-18': () => blocks('-120 -90 240 200', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, y ? 8 : 30]))),
@@ -85,6 +87,16 @@ export function tower(quiz, done, drop) {
 
 // Each picture uses the values shown in its question, so it is only revealed after an answer.
 export const EXPLAIN = {
+  nested() { // data["users"][1]["name"]
+    const steps = ['{}', '[1]', 'Lola'].map((text, i) => tile(text, 60 + i * 90, 50 + i * 40));
+    steps.forEach((t, i) => later(500 + i * 700, () => lit(t)));
+    return canvas('0 0 300 190', ...steps, label(60, 100, 'users'), label(150, 140, 'item'), label(240, 180, 'name'));
+  },
+  select() { // find_all("li", class_="book")
+    const items = word(['A', 'B', 'C'], 60, 90).map((t, i) => { place(t, 70 + i * 80, 70); return t; });
+    later(600, () => { [0, 1].forEach(i => { lit(items[i]); place(items[i], 70 + i * 80, 50); }); items[2].style.opacity = .35; });
+    return canvas('0 0 300 150', ...items, label(70, 120, 'book'), label(150, 120, 'book new'), label(230, 120, 'li'));
+  },
   query() { // WHERE year > 2000
     const tiles = word(['2001', '1999', '2010'], 70, 70).map((t, i) => { place(t, 70 + i * 80, 70); return t; });
     later(700, () => { lit(tiles[0]); lit(tiles[2]); tiles[1].style.opacity = .3; place(tiles[1], 150, 110); });

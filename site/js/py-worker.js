@@ -14,14 +14,15 @@ const BASE = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
   const flush = () => { try { py.runPython('import sys; sys.stdout.flush()'); } catch {} };
   // Downloaded and imported once, outside the program's time limit.
   const ready = new Set();
+  const PACKAGES = { sqlite3: 'sqlite3', numpy: 'numpy', pandas: 'pandas', bs4: 'beautifulsoup4' }; // import name: download name
   const prepare = async (id, code) => {
-    const needed = ['sqlite3', 'numpy', 'pandas'].filter(name => !ready.has(name) &&
+    const needed = Object.keys(PACKAGES).filter(name => !ready.has(name) &&
       new RegExp(`^\\s*(import|from)\\s+${name}\\b`, 'm').test(code));
     if (!needed.length) return true;
     postMessage({ id, loading: true });
     for (const name of needed) {
       try {
-        await py.loadPackage(name);
+        await py.loadPackage(PACKAGES[name]);
         py.runPython(`import ${name}`);
         ready.add(name);
       } catch {

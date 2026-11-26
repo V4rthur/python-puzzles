@@ -1,0 +1,150 @@
+/* Hex only: the theme animation's snapshot library cannot read oklch(). */
+:root { --paper: #f7f8f9; --surface: #eceef0; --surface-2: #dfe2e6; --rule: #cfd3d8; --ink: #15171a; --ink-2: #555c66; --field: #ffffff;
+  --line: #4a515b; --top: #ffffff; --side: #e3e6e9; --go: #12834e; --go-ink: #ffffff; --go-top: #bfead2; --go-side: #8fd3b0; --bad: #b3261e; color-scheme: light; }
+:root[data-theme="dark"] { --paper: #08090a; --surface: #111315; --surface-2: #1b1e21; --rule: #2c3136; --ink: #e8eaed; --ink-2: #9298a1; --field: #111315;
+  --line: #8b929c; --top: #15181b; --side: #0d0f11; --go: #7ee2a8; --go-ink: #06130c; --go-top: #1d4a33; --go-side: #11301f; --bad: #ff8f84; color-scheme: dark; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0 auto; max-width: 760px; padding: 16px 16px 60px; background: var(--paper); color: var(--ink); font: 15px/1.5 "Segoe UI", system-ui, sans-serif; overflow-wrap: break-word; }
+h1, h2 { font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; }
+h1 { font-size: 2.1rem; }
+h2 { font-size: 1.2rem; }
+a { color: var(--ink); }
+[data-lang="en"] .uz, [data-lang="uz"] .en { display: none; }
+header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+header a { flex: none; }
+header span#who { min-width: 0; margin-left: 16px; text-align: right; color: var(--ink-2); }
+
+pre, textarea.code, input.code { font-family: Consolas, ui-monospace, monospace; }
+pre { background: var(--surface); border-radius: 6px; padding: 12px 14px; white-space: pre-wrap; font-size: 14px; line-height: 1.45; }
+label { display: block; margin: 8px 0; }
+/* 16px: smaller text makes iPhones zoom in on focus. */
+input, textarea { display: block; width: 100%; margin-top: 3px; padding: 8px; border: 1px solid var(--ink-2); border-radius: 4px; background: var(--field); color: var(--ink); font-family: inherit; font-size: 16px; line-height: 1.4; }
+textarea { resize: vertical; }
+details { margin: 6px 0; color: var(--ink-2); }
+summary { cursor: pointer; padding: 4px 0; }
+details p { margin: 4px 0 8px; }
+button { font: inherit; padding: 10px 18px; border-radius: 8px; border: 0; background: var(--surface-2); color: var(--ink); cursor: pointer; transition: transform .12s, background-color .2s; }
+button:active { transform: scale(.97); }
+button.go { background: var(--go); color: var(--go-ink); font-weight: 600; }
+button:disabled { opacity: .5; cursor: default; }
+button.link { padding: 4px; margin-left: 8px; border: 0; background: none; color: var(--ink); text-decoration: underline; display: inline-block; vertical-align: middle; }
+
+form { max-width: 360px; }
+.note { color: var(--ink-2); font-size: 14px; }
+.msg, .score, .status { font-weight: 600; }
+.fb { font-size: 14px; font-weight: 600; white-space: pre-line; margin: 6px 0; }
+.ok { color: var(--go); }
+.no { color: var(--bad); }
+.prompt { white-space: pre-line; }
+
+.lessons { list-style: none; padding: 0; }
+.lessons li { margin-bottom: 2px; }
+.lessons a, .lessons .soon { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 6px; text-decoration: none; }
+.lessons a { background: var(--surface); }
+.lessons a:hover { background: var(--surface-2); }
+.lessons a .title { font-weight: 600; }
+.lessons .soon { color: var(--ink-2); padding-top: 3px; padding-bottom: 3px; font-size: 14px; }
+.info { flex: none; max-width: 45%; margin-left: 12px; text-align: right; font-size: 14px; }
+.info > span { display: inline-block; margin-left: 12px; }
+progress { display: block; width: 100%; height: 8px; margin: -8px 0 16px; border: 0; border-radius: 4px; overflow: hidden; background: var(--surface-2); -webkit-appearance: none; appearance: none; }
+progress::-webkit-progress-bar { background: var(--surface-2); }
+progress::-webkit-progress-value { background: var(--go); }
+progress::-moz-progress-bar { background: var(--go); }
+
+/* Lesson: one question per screen. The step bar turns green as blocks are solved. */
+.steps { display: flex; margin: 0 0 8px; }
+.steps button { flex: 1; min-width: 0; height: 28px; margin-right: 4px; padding: 0; border-radius: 4px; background: linear-gradient(var(--surface-2), var(--surface-2)) center / 100% 8px no-repeat; }
+.steps button.gap { margin-left: 8px; }
+.steps button.done { background-image: linear-gradient(var(--go), var(--go)); }
+.steps button[aria-current] { background-size: 100% 16px; }
+.steps button[aria-current]:not(.done) { background-image: linear-gradient(var(--ink-2), var(--ink-2)); }
+.stage { display: flex; flex-direction: column; }
+.art { order: -1; background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; justify-content: center; }
+.art .figure { max-height: 240px; }
+.art pre, .stage pre { background: var(--surface); }
+.row { display: flex; flex-wrap: wrap; margin-top: 8px; }
+.row button { margin: 0 8px 8px 0; }
+.finish { text-align: center; max-width: 420px; margin: 0 auto; }
+.finish .figure { max-height: 320px; }
+
+/* Home: a drawing for each puzzle that is ready */
+.covers { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); grid-gap: 12px; margin: 0 0 32px; }
+.covers a { display: block; height: 100%; padding: 20px; border-radius: 12px; background: var(--surface); text-decoration: none; transition: transform .2s, background-color .2s; }
+.covers a:hover { background: var(--surface-2); transform: translateY(-3px); }
+.covers .figure { height: 180px; margin-bottom: 12px; }
+.covers .title { display: block; font-weight: 600; }
+.covers .info { display: block; max-width: none; margin: 4px 0 0; text-align: left; color: var(--ink-2); }
+.covers .info > span { margin: 0 12px 0 0; }
+
+/* Isometric drawings (figures.js) */
+.figure { display: block; width: 100%; height: auto; position: relative; z-index: 1001; overflow: visible; }
+.figure .f { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linejoin: round; transition: fill .4s; }
+.figure .t { fill: var(--top); }
+.figure .s { fill: var(--side); }
+.figure .lit .t, .figure .full { fill: var(--go-top); }
+.figure .lit .s { fill: var(--go-side); }
+.figure .lit .f, .figure .full { stroke: var(--go); }
+.figure .ghost { opacity: .45; }
+.figure g { transition: transform .8s cubic-bezier(.2, .8, .2, 1), opacity .5s; }
+.figure text { fill: var(--ink); font: 600 15px Consolas, monospace; text-anchor: middle; }
+.figure .dot { fill: var(--go); }
+.figure .axis { fill: var(--line); }
+.figure .wave { animation: wave 3.6s ease-in-out var(--d) infinite; }
+.figure .wave .f { animation: glow 3.6s ease-in-out var(--d) infinite; }
+.covers a:hover .wave, .covers a:hover .wave .f { animation-duration: 1.8s; }
+/* `translate` adds to the transform that places each shape, so idle motion never moves it off its spot. */
+.figure .lit { animation: float 3s ease-in-out var(--d, 0s) infinite; }
+.figure .ghost { animation: breathe 4s ease-in-out var(--d) infinite; }
+.figure .full { animation: pulse 2.4s ease-in-out infinite; }
+.figure .dot { animation: pulse 1.4s ease-in-out infinite; }
+.figure .ring { fill: none; stroke: var(--go); stroke-width: 2; vector-effect: non-scaling-stroke; opacity: 0; transform-box: fill-box; transform-origin: center; animation: ring .9s ease-out .6s; }
+@keyframes wave { 0%, 60%, 100% { translate: 0 0; } 30% { translate: 0 -14px; } }
+@keyframes glow { 0%, 60%, 100% { stroke: var(--line); } 30% { stroke: var(--go); } }
+@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+@keyframes breathe { 0%, 100% { opacity: .3; } 50% { opacity: .65; } }
+@keyframes pulse { 50% { opacity: .55; } }
+@keyframes ring { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1.9); } }
+@media (prefers-reduced-motion: reduce) { .figure *, button, .covers a { transition: none !important; animation: none !important; } }
+
+/* Teacher page */
+select { display: block; width: 100%; margin-top: 3px; padding: 8px; font: inherit; font-size: 16px; }
+.teacher label { max-width: 360px; }
+.actions button { margin: 0 8px 6px 0; }
+button.danger { background: none; color: var(--bad); border: 1px solid var(--bad); }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; font-weight: 400; }
+thead th { font-weight: 600; }
+th .flag { display: block; color: var(--ink-2); font-size: 13px; }
+td button { padding: 4px 10px; }
+.answer { margin-top: 24px; }
+blockquote { margin: 8px 0; padding: 12px 14px; border-radius: 6px; background: var(--surface); white-space: pre-wrap; }
+.marking { max-width: none; margin-bottom: 8px; }
+.marking input { max-width: 120px; }
+/* Kept in view: the action that caused a message may be far above it. */
+.teacher #message { position: sticky; bottom: 0; padding: 8px 0; background: var(--paper); }
+.teacher #message:empty { padding: 0; }
+
+/* Language and theme buttons */
+.prefs { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; }
+.prefs button { background: var(--surface); color: var(--ink); border: 0; min-height: 40px; }
+.prefs button:hover { background: var(--surface-2); }
+.theme-toggle { position: relative; z-index: 1001; display: grid; place-items: center; width: 40px; padding: 0; margin-left: 8px; }
+.theme-toggle svg { overflow: visible; }
+.theme-toggle__body { fill: currentColor; }
+.theme-toggle__rays { stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.ink-canvas { position: fixed; top: 0; left: 0; z-index: 1000; width: 100%; height: 100%; pointer-events: none; visibility: hidden; }
+.ink-canvas.is-active { visibility: visible; }
+html.theme-fade, html.theme-fade * { transition: background-color .45s ease, border-color .45s ease, color .45s ease !important; }
+
+.out { margin: 8px 0; max-height: 200px; overflow: auto; }
+
+/* Lesson page on wide screens: the question beside the drawing */
+@media (min-width: 900px) {
+  body.lesson { max-width: 1120px; }
+  .lesson .intro { max-width: 70ch; }
+  .stage { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; align-items: start; }
+  .art { order: 0; min-height: 380px; margin: 0; }
+  .art .figure { max-height: 330px; }
+}

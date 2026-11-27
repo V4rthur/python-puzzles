@@ -33,7 +33,8 @@ export function studentRow(quiz, student, marks) {
   const unchecked = quiz.parts.filter(p => scoredParts(quiz).includes(p.id) && student.subs.some(s => s.part === p.id))
     // A question the student has not tried yet has no entry in `results`; an unchecked one has null.
     .some(p => p.items.some(q => q.type === 'code' && pointsOf(q) > 0 && !checked.has(q.id)
-      && student.subs.some(s => s.results && q.id in s.results)));
+      // Not `in`: it throws when a student sends a number or text as `results`.
+      && student.subs.some(s => Object.prototype.hasOwnProperty.call(s.results ?? {}, q.id))));
   const written = writtenItems(quiz).filter(q => pointsOf(q) > 0);
   const given = written.flatMap(q => own.filter(m => m.qid === q.id).map(m => Math.min(Number(m.points), pointsOf(q))));
   const toMark = needsMarking(quiz, student.subs, own);

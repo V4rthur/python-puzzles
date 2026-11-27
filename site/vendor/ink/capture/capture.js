@@ -72,6 +72,9 @@ export async function capturePage(theme       , scale        , maxTextureSize   
     windowHeight: document.documentElement.clientHeight,
     logging: false,
     useCORS: true,
+    // Local change: the drawings are hidden below, so their hundreds of shapes need not be copied (it took seconds).
+    // The <svg> itself stays, to keep its box in the layout.
+    ignoreElements: (el) => !!el.parentElement?.closest('svg[data-ink-live]'),
     onclone: (doc) => {
       doc.documentElement.dataset.theme = theme;
       // The live toggle is drawn above the overlay, so leave a hole for it. `visibility`

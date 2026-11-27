@@ -47,3 +47,12 @@ export function progressRows(lessons, quizzes, loadData) {
   });
   return { rows, done: rows.filter(r => r.state === 'done').length, total: lessons.filter(l => l.quiz).length };
 }
+
+// The lesson Continue opens: the started one with the newest submission, else the first new one.
+export function continueTarget(rows, loadData) {
+  const lastAt = row => Math.max(...loadData(row.quiz).subs.map(s => Date.parse(s.checked_at) || 0));
+  const latest = rows.filter(r => r.state === 'started').reduce((best, r) => !best || lastAt(r) > lastAt(best) ? r : best, null);
+  const row = latest ?? rows.find(r => r.state === 'new');
+  if (!row) return null;
+  return { row, label: rows.some(r => r.state === 'started' || r.state === 'done') ? 'continue' : 'start' };
+}

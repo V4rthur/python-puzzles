@@ -21,8 +21,8 @@
  
 
 const BACKGROUND                        = {
-  light: '#f7f8f9',
-  dark: '#08090a',
+  light: '#f5f7fc',
+  dark: '#0d1220',
 };
 
 const isCoarsePointer = ()          => window.matchMedia('(pointer: coarse)').matches;

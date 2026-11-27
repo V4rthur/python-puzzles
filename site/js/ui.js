@@ -55,6 +55,9 @@ export const tooLong = answers => JSON.stringify(answers).length > 15000;
 
 export const tabLabel = title => T(title.en.split(':')[0], title.uz.split(':')[0]);
 
+const HEADINGS = { predict: T('What is printed?', 'Ekranga nima chiqadi?'), code: T('Write the code', 'Kodni yozing'), written: T('Explain', 'Tushuntiring') };
+export const heading = type => HEADINGS[type];
+
 // What Enter should indent the next line with, given the current line up to the cursor.
 export const indentAfter = line => line.match(/^ */)[0] + (line.trimEnd().endsWith(':') ? '    ' : '');
 

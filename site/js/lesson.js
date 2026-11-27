@@ -3,7 +3,7 @@ import { isFilled, pointsOf, levelState, summarize, autoMax } from './core.js';
 import { tower, EXPLAIN } from './figures.js';
 import { createRunner, checkPart, runCode } from './checker.js';
 import { storage, getStudent, load, save } from './store.js';
-import { T, el, tx, tabLabel, indentAfter, makeId, startSync, tooLong } from './ui.js';
+import { T, el, tx, tabLabel, indentAfter, makeId, startSync, tooLong, heading } from './ui.js';
 
 const UI = {
   predict: T('Output', 'Natija'), written: T('Your answer', 'Javobingiz'), code: T('Your code', 'Kodingiz'),
@@ -60,8 +60,8 @@ async function start() {
   steps.setAttribute('aria-label', 'Questions / Savollar');
   $('steps-bar').append(steps);
   const intro = tx(el('p', { className: 'intro' }), quiz.intro);
-  const level = el('h2');
-  $('app').append(tx(el('h1'), quiz.title), intro, level);
+  const crumb = el('h1', { className: 'crumb' });
+  $('app').append(crumb, intro);
 
   const questions = quiz.parts.flatMap(part => part.items.map(q => ({ part, q })));
   const scored = questions.filter(({ part, q }) => part.id !== 'warmup' && q.type !== 'written' && pointsOf(q) > 0);
@@ -80,14 +80,15 @@ async function start() {
     step.onclick = () => { location.hash = q.id; };
     steps.append(step);
 
-    const task = el('div'), art = el('div', { className: 'art' });
+    const task = el('div', { className: 'task' }, tx(el('h2'), heading(q.type))), art = el('div', { className: 'art' });
     const section = el('section', { className: 'stage' }, task, art);
     if (q.prompt) task.append(tx(el('p', { className: 'prompt' }), q.prompt));
     if (q.code) task.append(el('pre', { textContent: q.code }));
     const prose = q.type === 'written';
+    // No id: the address holds #<question>, and the browser would scroll to a field with that id.
     const field = q.type === 'predict'
-      ? el('input', { id: q.id, className: 'code', maxLength: 200, autocomplete: 'off' })
-      : el('textarea', { id: q.id, className: prose ? '' : 'code', rows: prose ? 4 : 9, maxLength: 5000 });
+      ? el('input', { name: q.id, className: 'code', maxLength: 200, autocomplete: 'off' })
+      : el('textarea', { name: q.id, className: prose ? '' : 'code', rows: prose ? 4 : 9, maxLength: 5000 });
     field.spellcheck = prose;
     // Phone keyboards must not capitalise or "correct" code.
     if (!prose) for (const a of ['autocapitalize', 'autocorrect']) field.setAttribute(a, 'off');
@@ -97,17 +98,24 @@ async function start() {
     task.append(el('label', {}, tx(el('span'), UI[q.type]), field));
 
     const row = el('div', { className: 'row' });
+    row.setAttribute('data-ink-live', ''); // stays above the theme animation's snapshot
     const check = tx(el('button', { type: 'button', className: 'go check' }), UI.check);
     const why = tx(el('button', { type: 'button', hidden: true }), UI.why);
     const next = tx(el('button', { type: 'button', className: 'next' }), index === questions.length - 1 ? UI.finish : UI.next);
     next.onclick = () => { location.hash = questions[index + 1]?.q.id ?? 'done'; };
     checks.push(check);
+    // The one green button: Check until the question is done, then Next.
+    const main = done => { next.classList.toggle('go', done); check.classList.toggle('go', !done); };
+    // On a phone the sticky buttons and the screen edge can hide what just changed.
+    // Text goes to the centre: before Safari 14.1 'nearest' leaves it behind the sticky buttons.
+    const reveal = (node, block = 'center') => { if (innerWidth < 900) node.scrollIntoView({ block }); };
 
-    const panel = { part, q, step, section, art, revealed: false };
+    const panel = { part, q, step, section, art, main, revealed: false };
     const explain = () => {
       panel.revealed = true;
       why.hidden = true;
       art.replaceChildren(EXPLAIN[q.show](), tx(el('p'), q.why));
+      reveal(art, 'nearest');
     };
     why.onclick = explain;
 
@@ -115,6 +123,7 @@ async function start() {
       if (!isMe()) return;
       keep(data => { data.answers[q.id] = field.value; });
       feedback.textContent = '';
+      main(false);
     });
     // Enter keeps the indentation in code boxes; Tab stays free for keyboard navigation. In a one-line answer it checks.
     field.addEventListener('keydown', e => {
@@ -134,13 +143,14 @@ async function start() {
       run.onclick = async () => {
         const source = field.value;
         out.hidden = false;
-        if (!source.trim()) return void tx(out, UI.empty);
+        if (!source.trim()) return void reveal(tx(out, UI.empty));
         checks.forEach(b => { b.disabled = true; });
         tx(out, UI.running);
         try {
           const shown = await runCode(q, source, runner);
           tx(out, shown);
           if (shown.image) out.append(el('img', { src: `data:image/png;base64,${shown.image}`, alt: 'Your chart / Diagrammangiz', className: 'chart' }));
+          reveal(out);
         } finally { checks.forEach(b => { b.disabled = false; }); }
       };
       field.addEventListener('input', () => { out.hidden = true; });
@@ -160,14 +170,14 @@ async function start() {
       const answer = field.value;
       feedback.textContent = '';
       feedback.className = 'fb';
-      if (!isFilled(q, answer)) return void tx(feedback, UI.empty);
+      if (!isFilled(q, answer)) return void reveal(tx(feedback, UI.empty));
       const checked_at = new Date().toISOString();
       checks.forEach(b => { b.disabled = true; });
-      tx(feedback, UI.checking);
+      reveal(tx(feedback, UI.checking));
       try {
         const { results, messages } = await checkPart({ items: [q] }, { [q.id]: answer }, runner);
         const state = levelState(load(id).subs, part.id, q.id, answer, results[q.id]);
-        if (tooLong(state.answers)) return void tx(feedback, UI.tooLong);
+        if (tooLong(state.answers)) return void reveal(tx(feedback, UI.tooLong));
         const sub = { id: makeId(), group_code: student.code, name: student.name, quiz: quiz.id, part: part.id, ...state, checked_at };
         // Queued first, under the student who pressed Check, whatever happens to this page next.
         const queued = sync.add(sub);
@@ -178,7 +188,11 @@ async function start() {
         paint();
         if (field.value !== answer) return void (feedback.textContent = ''); // edited during the check
         const m = messages[q.id];
-        if (!m) return void tx(feedback, pointsOf(q) ? UI.saved : UI.noted);
+        if (!m) { // a written answer: saved is done
+          main(true);
+          return void reveal(tx(feedback, pointsOf(q) ? UI.saved : UI.noted));
+        }
+        main(m.ok);
         const mark = m.ok ? '✓' : '✗';
         tx(feedback, T(`${mark} ${m.en}`, `${mark} ${m.uz}`));
         feedback.className = `fb ${m.ok ? 'ok' : 'no'}`;
@@ -186,8 +200,12 @@ async function start() {
           why.hidden = true;
           panel.revealed = false;
           art.replaceChildren(tower(quiz, built(), q.id));
+          reveal(art, 'nearest');
           if (q.show) setTimeout(explain, 1400);
-        } else if (q.show && results[q.id] != null) why.hidden = false;
+        } else {
+          if (q.show && results[q.id] != null) why.hidden = false;
+          reveal(feedback);
+        }
       } finally { checks.forEach(b => { b.disabled = false; }); }
     };
     $('app').append(section);
@@ -222,15 +240,20 @@ async function start() {
       else p.step.removeAttribute('aria-current');
     }
     finish.hidden = !ended;
-    level.hidden = ended;
     intro.hidden = open !== panels[0];
     paint();
-    if (ended) return finishScreen();
-    tx(level, open.part.title);
+    if (ended) {
+      tx(crumb, quiz.title);
+      return finishScreen();
+    }
+    const { part } = open;
+    tx(crumb, T(`${quiz.title.en} · ${part.title.en}`, `${quiz.title.uz} · ${part.title.uz}`));
+    if (built().has(open.q.id)) open.main(true);
     if (!open.revealed) open.art.replaceChildren(tower(quiz, built()));
   };
   show();
-  addEventListener('hashchange', show);
+  // A new question starts at its top: checking may have scrolled the last one down.
+  addEventListener('hashchange', () => { show(); scrollTo(0, 0); });
   addEventListener('pageshow', e => { if (e.persisted) isMe(); });
   addEventListener('storage', e => { if (e.key === 'pz:student') isMe(); });
 }

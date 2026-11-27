@@ -1,8 +1,8 @@
 /* Hex only: the theme animation's snapshot library cannot read oklch(). */
-:root { --paper: #f7f8f9; --surface: #eceef0; --surface-2: #dfe2e6; --rule: #cfd3d8; --ink: #15171a; --ink-2: #555c66; --field: #ffffff;
-  --line: #4a515b; --top: #ffffff; --side: #e3e6e9; --go: #12834e; --go-ink: #ffffff; --go-top: #bfead2; --go-side: #8fd3b0; --bad: #b3261e; color-scheme: light; }
-:root[data-theme="dark"] { --paper: #08090a; --surface: #111315; --surface-2: #1b1e21; --rule: #2c3136; --ink: #e8eaed; --ink-2: #9298a1; --field: #111315;
-  --line: #8b929c; --top: #15181b; --side: #0d0f11; --go: #7ee2a8; --go-ink: #06130c; --go-top: #1d4a33; --go-side: #11301f; --bad: #ff8f84; color-scheme: dark; }
+:root { --paper: #f5f7fc; --surface: #e9edf7; --surface-2: #dce2f0; --rule: #cbd3e6; --ink: #131a2b; --ink-2: #4f5972; --field: #ffffff;
+  --line: #46506b; --top: #ffffff; --side: #dfe5f3; --go: #11794a; --go-ink: #ffffff; --go-top: #bfead2; --go-side: #8fd3b0; --go-lip: #0b5c36; --bad: #b3261e; color-scheme: light; }
+:root[data-theme="dark"] { --paper: #0d1220; --surface: #151c2e; --surface-2: #1f2840; --rule: #2a3452; --ink: #e8ecf5; --ink-2: #96a0ba; --field: #151c2e;
+  --line: #7e8aa8; --top: #212b47; --side: #161e33; --go: #7ee2a8; --go-ink: #06130c; --go-top: #24604a; --go-side: #173f33; --go-lip: #3f9e6c; --bad: #ff8f84; color-scheme: dark; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0 auto; max-width: 760px; padding: 16px 16px 60px; background: var(--paper); color: var(--ink); font: 15px/1.5 "Segoe UI", system-ui, sans-serif; overflow-wrap: break-word; }
@@ -11,6 +11,8 @@ h1 { font-size: 2.1rem; }
 h2 { font-size: 1.2rem; }
 a { color: var(--ink); }
 [data-lang="en"] .uz, [data-lang="uz"] .en { display: none; }
+/* Read by screen readers, not shown. */
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
 header a { flex: none; }
 header span#who { min-width: 0; margin-left: 16px; text-align: right; color: var(--ink-2); }
@@ -24,10 +26,12 @@ textarea { resize: vertical; }
 details { margin: 6px 0; color: var(--ink-2); }
 summary { cursor: pointer; padding: 4px 0; }
 details p { margin: 4px 0 8px; }
-button { font: inherit; padding: 10px 18px; border-radius: 8px; border: 0; background: var(--surface-2); color: var(--ink); cursor: pointer; transition: transform .12s, background-color .2s; }
+button { font: inherit; padding: 10px 18px; border-radius: 8px; border: 0; background: var(--surface-2); color: var(--ink); cursor: pointer; transition: transform .12s, box-shadow .12s, background-color .2s; }
 button:active { transform: scale(.97); }
-button.go { background: var(--go); color: var(--go-ink); font-weight: 600; }
-button:disabled { opacity: .5; cursor: default; }
+button.go, a.go { background: var(--go); color: var(--go-ink); font-weight: 600; border-radius: 12px; box-shadow: 0 4px 0 var(--go-lip); margin-bottom: 4px; }
+button.go:active:not(:disabled), a.go:active { transform: translateY(4px); box-shadow: none; }
+a.go { display: block; padding: 12px 18px; text-align: center; text-decoration: none; transition: transform .12s, box-shadow .12s; }
+button:disabled { opacity: .5; cursor: default; transform: none; }
 button.link { padding: 4px; margin-left: 8px; border: 0; background: none; color: var(--ink); text-decoration: underline; display: inline-block; vertical-align: middle; }
 
 form { max-width: 360px; }
@@ -54,28 +58,71 @@ progress::-moz-progress-bar { background: var(--go); }
 
 /* Lesson: one question per screen. The step bar turns green as blocks are solved. */
 .steps { display: flex; margin: 0 0 8px; }
-.steps button { flex: 1; min-width: 0; height: 28px; margin-right: 4px; padding: 0; border-radius: 4px; background: linear-gradient(var(--surface-2), var(--surface-2)) center / 100% 8px no-repeat; }
-.steps button.gap { margin-left: 8px; }
+.steps button { flex: 1; min-width: 0; height: 28px; margin-right: 4px; padding: 0; border-radius: 4px; background: linear-gradient(var(--surface-2), var(--surface-2)) center / 100% 10px no-repeat; }
+.steps button.gap { margin-left: 14px; }
 .steps button.done { background-image: linear-gradient(var(--go), var(--go)); }
-.steps button[aria-current] { background-size: 100% 16px; }
+.steps button[aria-current] { background-size: 100% 18px; }
 .steps button[aria-current]:not(.done) { background-image: linear-gradient(var(--ink-2), var(--ink-2)); }
+.crumb { margin: 0 0 4px; color: var(--ink-2); font-size: 14px; font-weight: 400; line-height: 1.4; letter-spacing: 0; }
+/* Phone: the task, then the picture, then the buttons, which stick to the bottom of the screen. */
 .stage { display: flex; flex-direction: column; }
-.art { order: -1; background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; justify-content: center; }
+.task { display: contents; }
+.task h2 { margin: 8px 0 4px; font-size: 1.75rem; }
+.art { background: var(--surface); border-radius: 16px; padding: 16px; margin-top: 12px; display: flex; flex-direction: column; justify-content: center; }
+/* Room for the sticky buttons when something is scrolled into view (ignored before Safari 14.1). */
+.art, .stage .fb, .stage .out, .stage input, .stage textarea, .stage summary { scroll-margin-bottom: 120px; }
 .art .figure { max-height: 240px; }
 .art pre, .stage pre { background: var(--surface); }
 .row { display: flex; flex-wrap: wrap; margin-top: 8px; }
 .row button { margin: 0 8px 8px 0; }
+/* Above the drawings (1001) and, being data-ink-live, above the theme animation. */
+.stage .row { order: 1; position: -webkit-sticky; position: sticky; bottom: 0; z-index: 1002; margin: 0 -16px; padding: 10px 8px 2px 16px; background: var(--paper); }
 .finish { text-align: center; max-width: 420px; margin: 0 auto; }
 .finish .figure { max-height: 320px; }
 
-/* Home: a drawing for each puzzle that is ready */
-.covers { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); grid-gap: 12px; margin: 0 0 32px; }
-.covers a { display: block; height: 100%; padding: 20px; border-radius: 12px; background: var(--surface); text-decoration: none; transition: transform .2s, background-color .2s; }
-.covers a:hover { background: var(--surface-2); transform: translateY(-3px); }
-.covers .figure { height: 180px; margin-bottom: 12px; }
-.covers .title { display: block; font-weight: 600; }
-.covers .info { display: block; max-width: none; margin: 4px 0 0; text-align: left; color: var(--ink-2); }
-.covers .info > span { margin: 0 12px 0 0; }
+/* Home: the lessons are stops on a winding path. --shift is how far the path swings. */
+.path { --shift: 40px; list-style: none; padding: 0; margin: 0 0 32px; }
+.stop { position: relative; padding: 0 0 32px calc(var(--o) * var(--shift)); }
+.stop:last-child { padding-bottom: 0; }
+.stop a { display: flex; align-items: flex-start; text-decoration: none; }
+/* From the middle of one drawing's tile to the middle of the next, under both: same z-index, earlier in the page. */
+.link-line { position: absolute; top: 40px; left: 48px; width: var(--shift); height: 100%; overflow: visible; z-index: 1001; pointer-events: none; }
+.link-line path { fill: none; stroke: var(--rule); stroke-width: 6; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.stop.done .link-line path { stroke: var(--go); }
+.disc { flex: none; position: relative; z-index: 1001; width: 96px; height: 80px; padding: 6px; border: 2px solid transparent; border-radius: 20px; background: var(--surface); }
+.stop a:hover .disc { background: var(--surface-2); }
+/* A border, not a box-shadow ring: the theme animation's snapshot paints that as a solid block. */
+.stop.now .disc { border-color: var(--go); }
+.stop .figure { height: 100%; }
+.stop.done .figure .f { stroke: var(--go); }
+.stop.done .figure .t { fill: var(--go-top); }
+.stop.done .figure .s { fill: var(--go-side); }
+.stop .text { display: flex; flex-direction: column; justify-content: center; flex: 1; min-width: 0; min-height: 80px; margin-left: 12px; }
+.stop .title { font-weight: 600; line-height: 1.3; }
+.stop .info { max-width: none; margin: 4px 0 0; text-align: left; color: var(--ink-2); }
+.stop .info > span { margin: 0 12px 0 0; }
+.stop.done .info > span:first-child { color: var(--go); }
+.stop.now .wave, .stop a:hover .wave { animation: wave 3.6s ease-in-out var(--d) infinite; }
+.stop.now .wave .f, .stop a:hover .wave .f { animation: glow 3.6s ease-in-out var(--d) infinite; }
+/* The glow starts from grey, so a finished drawing only moves. */
+.stop.done a:hover .wave .f { animation: none; }
+/* The next lesson. Phone: only its button, fixed to the bottom, above the drawings and the theme animation. */
+.upnext { position: fixed; right: 0; bottom: 0; left: 0; z-index: 1002; padding: 12px 16px; background: var(--paper); }
+.upnext > :not(a) { display: none; }
+/* Room under the page for that button, also when keyboard focus scrolls to a stop. */
+body.home { padding-bottom: 100px; }
+.stop a { scroll-margin-bottom: 100px; }
+@media (min-width: 900px) {
+  body.home { max-width: 1000px; padding-bottom: 60px; }
+  /* Sign-in stays where it sat on the narrower page. */
+  .home #app > h1, .home #app > form { margin-left: 120px; }
+  .home .cols { display: grid; grid-template-columns: 300px minmax(0, 1fr); column-gap: 40px; align-items: start; }
+  .path { --shift: 150px; margin-top: 16px; }
+  .upnext { position: relative; margin-bottom: 24px; padding: 18px; border-radius: 16px; background: var(--surface); }
+  .upnext > .figure { display: block; height: 140px; margin-bottom: 12px; }
+  .upnext > p, .upnext > h2 { display: block; }
+  .upnext h2 { margin: 0 0 16px; }
+}
 
 /* Isometric drawings (figures.js) */
 .figure { display: block; width: 100%; height: auto; position: relative; z-index: 1001; overflow: visible; }
@@ -90,9 +137,6 @@ progress::-moz-progress-bar { background: var(--go); }
 .figure text { fill: var(--ink); font: 600 15px Consolas, monospace; text-anchor: middle; }
 .figure .dot { fill: var(--go); }
 .figure .axis { fill: var(--line); }
-.figure .wave { animation: wave 3.6s ease-in-out var(--d) infinite; }
-.figure .wave .f { animation: glow 3.6s ease-in-out var(--d) infinite; }
-.covers a:hover .wave, .covers a:hover .wave .f { animation-duration: 1.8s; }
 /* `translate` adds to the transform that places each shape, so idle motion never moves it off its spot. */
 .figure .lit { animation: float 3s ease-in-out var(--d, 0s) infinite; }
 .figure .ghost { animation: breathe 4s ease-in-out var(--d) infinite; }
@@ -105,7 +149,7 @@ progress::-moz-progress-bar { background: var(--go); }
 @keyframes breathe { 0%, 100% { opacity: .3; } 50% { opacity: .65; } }
 @keyframes pulse { 50% { opacity: .55; } }
 @keyframes ring { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1.9); } }
-@media (prefers-reduced-motion: reduce) { .figure *, button, .covers a { transition: none !important; animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .figure *, button, a.go { transition: none !important; animation: none !important; } }
 
 /* Teacher page */
 select { display: block; width: 100%; margin-top: 3px; padding: 8px; font: inherit; font-size: 16px; }
@@ -147,6 +191,8 @@ html.theme-fade, html.theme-fade * { transition: background-color .45s ease, bor
   body.lesson { max-width: 1120px; }
   .lesson .intro { max-width: 70ch; }
   .stage { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; align-items: start; }
-  .art { order: 0; min-height: 380px; margin: 0; }
+  .task { display: block; }
+  .stage .row { position: relative; margin: 8px 0 0; padding: 0; }
+  .art { min-height: 380px; margin: 0; }
   .art .figure { max-height: 330px; }
 }

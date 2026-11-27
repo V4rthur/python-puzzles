@@ -31,37 +31,54 @@ const tile = (char, x, y) => {
 };
 const place = (node, x, y) => { node.style.transform = `translate(${x}px, ${y}px)`; };
 const word = (text, y, left = 40) => [...text].map((char, i) => tile(char, left + i * 46, y));
-// Blocks in a grid, rising in turn. `cells`: [x, y, height] on a 34-unit floor.
-const blocks = (view, cells) => canvas(view, ...cells.map(([x, y, h], i) => wave(move(box(26, 26, h), x * 34, y * 34, 0), i)));
+// Boxes [x, y, z, w, d, h], rising in turn. The frame is worked out from them, so every cover sits in its middle.
+// All frames are at least 240 by 190, which keeps small covers at one scale.
+const solids = list => {
+  const corners = list.flatMap(([x, y, z, w, d, h]) =>
+    [x, x + w].flatMap(a => [y, y + d].flatMap(b => [z, z + h].map(c => iso(a, b, c)))));
+  const span = (axis, least) => {
+    const values = corners.map(p => p[axis]), low = Math.min(...values), high = Math.max(...values);
+    const size = Math.max(least, high - low + 28); // room for the wave, which lifts a shape by 14
+    return [(low + high - size) / 2, size];
+  };
+  const [left, width] = span(0, 240), [top, height] = span(1, 190);
+  return canvas(`${left} ${top} ${width} ${height}`, ...list.map(([x, y, z, w, d, h], i) => wave(move(box(w, d, h), x, y, z), i)));
+};
+// Blocks in a grid. `cells`: [x, y, height] on a 34-unit floor.
+const blocks = cells => solids(cells.map(([x, y, h]) => [x * 34, y * 34, 0, 26, 26, h]));
 const COVERS = {
-  'review-8-11': () => blocks('-120 -100 240 210', [0, 1, 2].flatMap(x => [0, 1, 2].map(y => [x, y, x === y ? 44 : 10]))),
-  'review-13-20': () => blocks('-130 -110 250 220', [[0, 0, 18], [1, 0, 32], [2, 0, 46], [3, 0, 60], [0, 2, 60], [1, 2, 46], [2, 2, 32], [3, 2, 18]]),
-  'review-all': () => canvas('-110 -150 220 240', ...[0, 1, 2, 3].map(i => { const w = 100 - i * 22; return wave(move(box(w, w, 24), -w / 2, -w / 2, i * 28), i); })),
-  'lesson-23': () => blocks('-120 -120 240 230', [[0, 1, 22], [1, 1, 48], [2, 1, 34], [3, 1, 74], [4, 1, 56]]),
-  'lesson-14': () => blocks('-130 -100 250 210', [[0, 0, 56], [0, 1, 40], [2, 0, 8], [3, 0, 8], [5, 0, 40], [5, 1, 56]]),
-  'lesson-15': () => blocks('-120 -100 240 210', [[1, 0, 58], [0, 1, 34], [2, 1, 34], [0, 3, 12], [1, 3, 12], [2, 3, 12], [3, 3, 12]]),
-  'lesson-16': () => canvas('-110 -120 220 200', ...[0, 1, 2].map(i => wave(move(box(80, 80, 22), -40, -40, i * 34), i))),
-  'lesson-17': () => blocks('-110 -100 240 210', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, 16]))),
-  'lesson-18': () => blocks('-120 -90 240 200', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, y ? 8 : 30]))),
-  'lesson-19': () => blocks('-120 -100 240 210', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, (x + y) % 3 ? 6 : 40]))),
-  'lesson-20': () => blocks('-130 -110 250 220', [[0, 0, 50], [0, 1, 40], [2, 0, 24], [2, 1, 18], [4, 0, 62], [4, 1, 54]]),
-  'lesson-22': () => blocks('-130 -90 250 200', [[0, 0, 20], [0, 1, 20], [1, 0, 20], [1, 1, 20], [3, 0, 34], [3, 1, 34], [4, 0, 34], [4, 1, 34]]),
-  'lesson-08': () => blocks('-110 -90 240 200', [[0, 1, 12], [1, 1, 28], [2, 1, 52], [3, 1, 28], [4, 1, 12]]),
-  'lesson-09': () => blocks('-110 -80 240 190', [[0, 0, 30], [1, 0, 30], [2, 0, 6], [3, 0, 30], [0, 1, 30], [1, 1, 6], [2, 1, 30], [3, 1, 30]]),
-  'lesson-10': () => blocks('-120 -90 240 200', [0, 2, 4].flatMap(x => [[x, 0, 18], [x, 1, 34]])),
-  'lesson-11': () => blocks('-110 -100 240 210', [[0, 0, 20], [2, 0, 20], [0, 2, 20], [2, 2, 20], [1, 1, 56]]),
-  'lesson-13': () => blocks('-110 -90 240 200', [0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, 8 + (x + y) * 5]))),
-  'lesson-03': () => blocks('-90 -80 240 190', [0, 1, 2, 3, 4].map(i => [i, 0, 22])),
-  'lesson-04': () => blocks('-130 -80 240 190', [0, 1, 2, 3].flatMap(i => [[i, 0, 14], [i, 2, 34]])),
-  'lesson-05': () => blocks('-110 -80 240 190', [[0, 1, 16], [1, 1, 16], [2, 0, 30], [3, 0, 30], [2, 2, 8], [3, 2, 8]]),
-  'lesson-06': () => blocks('-120 -100 240 210', [[0, 0, 8], [1, 0, 16], [2, 0, 24], [2, 1, 32], [2, 2, 40], [1, 2, 48], [0, 2, 56], [0, 1, 64]]),
-  'lesson-02': () => canvas('0 0 300 140', ...word('PYTHON', 85, 35).map((node, i) => wave(S('g', {}, node), i))),
-  'lesson-01': () => canvas('-110 -150 220 240', ...range(5).map(i => wave(move(box(100, 100, 9), -50, -50, i * 13 + (i === 4 ? 22 : 0)), i))),
-  'review-1-6': () => canvas('-120 -175 240 270', ...range(8).map(i => wave(move(box(7, 80, 100 - i * 12), -70 + i * 19, -40, 0), i))),
+  'review-8-11': () => blocks([0, 1, 2].flatMap(x => [0, 1, 2].map(y => [x, y, x === y ? 44 : 10]))),
+  'review-13-20': () => blocks([[0, 0, 18], [1, 0, 32], [2, 0, 46], [3, 0, 60], [0, 2, 60], [1, 2, 46], [2, 2, 32], [3, 2, 18]]),
+  'review-all': () => solids([0, 1, 2, 3].map(i => { const w = 100 - i * 22; return [-w / 2, -w / 2, i * 28, w, w, 24]; })),
+  'lesson-23': () => blocks([[0, 1, 22], [1, 1, 48], [2, 1, 34], [3, 1, 74], [4, 1, 56]]),
+  'lesson-14': () => blocks([[0, 0, 56], [0, 1, 40], [2, 0, 8], [3, 0, 8], [5, 0, 40], [5, 1, 56]]),
+  'lesson-15': () => blocks([[1, 0, 58], [0, 1, 34], [2, 1, 34], [0, 3, 12], [1, 3, 12], [2, 3, 12], [3, 3, 12]]),
+  'lesson-16': () => solids([0, 1, 2].map(i => [-40, -40, i * 34, 80, 80, 22])),
+  'lesson-17': () => blocks([0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, 16]))),
+  'lesson-18': () => blocks([0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, y ? 8 : 30]))),
+  'lesson-19': () => blocks([0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, (x + y) % 3 ? 6 : 40]))),
+  'lesson-20': () => blocks([[0, 0, 50], [0, 1, 40], [2, 0, 24], [2, 1, 18], [4, 0, 62], [4, 1, 54]]),
+  'lesson-22': () => blocks([[0, 0, 20], [0, 1, 20], [1, 0, 20], [1, 1, 20], [3, 0, 34], [3, 1, 34], [4, 0, 34], [4, 1, 34]]),
+  'lesson-08': () => blocks([[0, 1, 12], [1, 1, 28], [2, 1, 52], [3, 1, 28], [4, 1, 12]]),
+  'lesson-09': () => blocks([[0, 0, 30], [1, 0, 30], [2, 0, 6], [3, 0, 30], [0, 1, 30], [1, 1, 6], [2, 1, 30], [3, 1, 30]]),
+  'lesson-10': () => blocks([0, 2, 4].flatMap(x => [[x, 0, 18], [x, 1, 34]])),
+  'lesson-11': () => blocks([[0, 0, 20], [2, 0, 20], [0, 2, 20], [2, 2, 20], [1, 1, 56]]),
+  'lesson-13': () => blocks([0, 1, 2, 3].flatMap(x => [0, 1, 2].map(y => [x, y, 8 + (x + y) * 5]))),
+  'lesson-03': () => blocks([0, 1, 2, 3, 4].map(i => [i, 0, 22])),
+  'lesson-04': () => blocks([0, 1, 2, 3].flatMap(i => [[i, 0, 14], [i, 2, 34]])),
+  'lesson-05': () => blocks([[0, 1, 16], [1, 1, 16], [2, 0, 30], [3, 0, 30], [2, 2, 8], [3, 2, 8]]),
+  'lesson-06': () => blocks([[0, 0, 8], [1, 0, 16], [2, 0, 24], [2, 1, 32], [2, 2, 40], [1, 2, 48], [0, 2, 56], [0, 1, 64]]),
+  'lesson-02': () => canvas('30 8 165 100', ...[...word('PYT', 46, 55), ...word('HON', 90, 78)].map((node, i) => wave(S('g', {}, node), i))),
+  'lesson-01': () => solids(range(5).map(i => [-50, -50, i * 13 + (i === 4 ? 22 : 0), 100, 100, 9])),
+  'review-1-6': () => solids(range(8).map(i => [-70 + i * 19, -40, 0, 7, 80, 100 - i * 12])),
 };
 // Lessons without their own drawing yet get a row of cubes.
-const chain = () => canvas('-120 -90 240 170', ...range(6).map(i => wave(move(box(24, 24, 24), -90 + i * 31, -12, 0), i)));
+const chain = () => solids(range(6).map(i => [-90 + i * 31, -12, 0, 24, 24, 24]));
 export const cover = quizId => (COVERS[quizId] ?? chain)();
+
+// The home path: a solid line from one stop to the next. `from` and `to` are their offsets, 0 to 1.
+export const connector = (from, to) => S('svg', { viewBox: '0 0 1 1', preserveAspectRatio: 'none', class: 'link-line', 'aria-hidden': 'true', 'data-ink-live': '' },
+  S('path', { d: `M${from} 0C${from} .5 ${to} .5 ${to} 1` }));
 
 // The tower: one layer per level, one block per auto-scored question. `done`: ids with full points.
 export function tower(quiz, done, drop) {
@@ -85,8 +102,9 @@ export function tower(quiz, done, drop) {
       return node;
     });
   });
-  const top = layers.length * 30 + 130;
-  return canvas(`-110 -${top} 220 ${top + 70}`, ...blocks, ...(ring ? [ring] : []));
+  // The frame is centred on the finished tower; a dropping block starts above it.
+  const height = layers.length * 30;
+  return canvas(`-110 -${height + 65} 220 ${height + 135}`, ...blocks, ...(ring ? [ring] : []));
 }
 
 // Each picture uses the values shown in its question, so it is only revealed after an answer.
@@ -98,7 +116,7 @@ export const EXPLAIN = {
       later(500 + i * 300, () => { bar.replaceChildren(move(box(34, 34, value * 18), x, -x, 0)); lit(bar); });
       return [bar, label(X, Y + 44, `${'abc'[i]} = ${value}`)];
     });
-    return canvas('-180 -150 360 230', ...columns.flat());
+    return canvas('-180 -127 360 230', ...columns.flat());
   },
   nested() { // data["users"][1]["name"]
     const steps = ['{}', '[1]', 'Lola'].map((text, i) => tile(text, 60 + i * 90, 50 + i * 40));
@@ -127,7 +145,7 @@ export const EXPLAIN = {
     const scores = [70, 95, 60].map((v, i) => tile(String(v), 80, 40 + i * 48));
     const passed = ['T', 'T', 'F'].map((v, i) => tile(v, 200, 40 + i * 48));
     passed.forEach((t, i) => { t.style.opacity = 0; later(500 + i * 500, () => { t.style.opacity = 1; if (i < 2) lit(t); }); });
-    return canvas('0 0 280 180', ...scores, ...passed);
+    return canvas('0 -11 280 180', ...scores, ...passed);
   },
   slices() { // loc[0:1] and iloc[0:1]
     const loc = word(['0', '1', '2'], 55, 130), iloc = word(['0', '1', '2'], 130, 130);
@@ -138,7 +156,7 @@ export const EXPLAIN = {
   groups() { // shop B: 2 + 4 + 1
     const values = ['3', '5', '2', '4', '1'], tiles = word(values, 55, 50);
     later(700, () => tiles.forEach((t, i) => { place(t, i < 2 ? 40 + i * 46 : 170 + (i - 2) * 46, 90); if (i > 1) lit(t); }));
-    return canvas('0 0 300 170', ...tiles, label(63, 140, 'A'), label(216, 140, 'B = 7'));
+    return canvas('0 17 300 170', ...tiles, label(63, 140, 'A'), label(216, 140, 'B = 7'));
   },
   merge() { // inner merge on id
     const a = word(['1', '2'], 45, 70), b = word(['2', '3'], 140, 140);
@@ -150,7 +168,7 @@ export const EXPLAIN = {
     inner.style.opacity = 0;
     later(600, () => { inner.style.opacity = 1; lit(inner); });
     later(2000, () => { inner.style.opacity = 0; place(inner, 200, 30); lit(outer); });
-    return canvas('0 0 280 160', outer, inner, label(80, 130, 'x'), label(200, 130, 'inside'));
+    return canvas('0 13 280 160', outer, inner, label(80, 130, 'x'), label(200, 130, 'inside'));
   },
   flow() { // try, except, finally
     const steps = ['A', 'B'].map((c, i) => tile(c, 150 + i * 100, 70)), start = tile('/0', 50, 70);
@@ -181,7 +199,7 @@ export const EXPLAIN = {
     const last = tiles[3];
     place(last, 178, 20);
     later(700, () => { lit(last); place(last, 178, 90); });
-    return canvas('0 0 270 150', ...tiles);
+    return canvas('-27 0 270 150', ...tiles);
   },
   copy() { // b = a, c = a.copy()
     const one = word(['1', '2', '3'], 55, 110), two = word(['1', '2'], 140, 110);
@@ -200,7 +218,7 @@ export const EXPLAIN = {
     bun.style.opacity = 0;
     later(600, () => { tea.lastChild.textContent = '6'; lit(tea); });
     later(1300, () => { bun.style.opacity = 1; lit(bun); place(bun, 200, 90); });
-    return canvas('0 0 260 160', tea, pie, bun, label(60, 135, 'tea'), label(130, 135, 'pie'), label(200, 135, 'bun'));
+    return canvas('0 21 260 160', tea, pie, bun, label(60, 135, 'tea'), label(130, 135, 'pie'), label(200, 135, 'bun'));
   },
   overlap() { // {1, 2, 3} & {3, 4}
     const a = word(['1', '2', '3'], 45), b = word(['3', '4'], 140, 160);
@@ -236,7 +254,7 @@ export const EXPLAIN = {
   ends() { // s[0], s[-1]
     const tiles = word('Python', 90);
     later(600, () => [0, 5].forEach(i => { lit(tiles[i]); place(tiles[i], 40 + i * 46, 65); }));
-    return canvas('0 0 310 150', ...tiles, label(40, 135, '0'), label(270, 135, '-1'));
+    return canvas('0 14 310 150', ...tiles, label(40, 135, '0'), label(270, 135, '-1'));
   },
   slice() { // s[1:4], s[::-1]
     const tiles = word('Python', 50), back = word('Python', 50);
@@ -248,13 +266,13 @@ export const EXPLAIN = {
     const tiles = word('banana', 70);
     [1, 3, 5].forEach((i, n) => later(500 + n * 400, () => lit(tiles[i])));
     later(1900, () => place(tiles[2], 132, 40));
-    return canvas('0 0 310 150', ...tiles, ...[0, 1, 2, 3, 4, 5].map(i => label(40 + i * 46, 115, String(i))));
+    return canvas('0 -9 310 150', ...tiles, ...[0, 1, 2, 3, 4, 5].map(i => label(40 + i * 46, 115, String(i))));
   },
   frozen() { // name.upper() leaves name as it is
     const old = word('ali', 50, 100), made = word('ali', 50, 100), fresh = word('Ali', 140, 100);
     fresh.forEach(node => { node.style.opacity = 0; });
     later(700, () => fresh.forEach((node, i) => { node.style.opacity = 1; lit(node); made[i].style.transform = `translate(${100 + i * 46}px, 140px)`; made[i].style.opacity = 0; }));
-    return canvas('0 0 300 180', ...old, ...made, ...fresh, label(40, 50, 'name'), label(40, 140, 'new'));
+    return canvas('-33 0 300 180', ...old, ...made, ...fresh, label(40, 50, 'name'), label(40, 140, 'new'));
   },
   clean() { // strip the spaces, then capitalise
     const tiles = word('  aLI  ', 70, 20);
@@ -274,7 +292,7 @@ export const EXPLAIN = {
       move(c, -100 + (i % 5) * 19, -90 + group * 62, 0);
       if (group === 3) lit(c);
     }));
-    return canvas('-190 -150 340 270', ...cubes);
+    return canvas('-209 -165 340 270', ...cubes);
   },
   floor() { // -7 // 2
     const name = label(0, 45, '-3.5');
@@ -303,12 +321,12 @@ export const EXPLAIN = {
       later(700, () => { bar.replaceChildren(move(box(36, 36, to), x, -x, 0)); lit(bar); out.textContent = result; });
       return [bar, out];
     };
-    return canvas('-170 -150 340 220', ...column(-65, 95, 'int(7.9)', 84, '7'), ...column(0, 95, 'round(7.9)', 96, '8'), ...column(65, 72, '6 / 3', 24, '2.0'));
+    return canvas('-170 -124 340 220', ...column(-65, 95, 'int(7.9)', 84, '7'), ...column(0, 95, 'round(7.9)', 96, '8'), ...column(65, 72, '6 / 3', 24, '2.0'));
   },
   share() { // 49.5 shared by 4 with / instead of //
     const parts = range(4).map(i => move(box(48, 48, 26), -100 + i * 49, 0, 0));
     later(500, () => parts.forEach((p, i) => { move(p, -125 + i * 68, 0, 0); lit(p); }));
-    return canvas('-150 -110 320 220', ...parts, label(0, 95, '49.5 / 4 = 12.375'));
+    return canvas('-179 -110 320 220', ...parts, label(0, 95, '49.5 / 4 = 12.375'));
   },
   pizzas() { // 33 slices, 8 per pizza
     const slices = range(40).map(n => {

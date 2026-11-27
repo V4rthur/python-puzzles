@@ -199,6 +199,26 @@ blockquote { margin: 8px 0; padding: 12px 14px; border-radius: 6px; background: 
 .teacher #message { position: sticky; bottom: 0; padding: 8px 0; background: var(--paper); }
 .teacher #message:empty { padding: 0; }
 
+/* Class overview: students against lessons. */
+body.teacher { max-width: 1120px; }
+.tabs button[aria-pressed="true"] { background: var(--go); color: var(--go-ink); font-weight: 600; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); grid-gap: 12px; list-style: none; padding: 0; }
+.cards li { padding: 14px; border-radius: 12px; background: var(--surface); color: var(--ink-2); }
+.cards strong { display: block; color: var(--ink); font-size: 26px; }
+table.grid { width: auto; }
+.grid th, .grid td { padding: 2px; border: 0; text-align: center; vertical-align: middle; }
+.grid thead th { color: var(--ink-2); font-size: 12px; font-weight: 400; }
+/* The names stay put while the lessons scroll sideways. */
+.grid th:first-child { position: -webkit-sticky; position: sticky; left: 0; z-index: 1; padding-right: 10px; background: var(--paper); color: var(--ink); text-align: left; white-space: nowrap; }
+.grid .cell { width: 30px; height: 30px; padding: 0; border: 1px solid var(--go); border-radius: 6px; background: transparent; font-size: 13px; }
+.grid .cell.done { border-color: var(--go-top); background: var(--go-top); }
+.grid .cell.mark { border-bottom: 5px solid var(--ink); }
+.grid .none { width: 32px; color: var(--ink-2); }
+.grid .sum { padding-left: 8px; white-space: nowrap; }
+.reteach { list-style: none; padding: 0; }
+.reteach li { padding: 12px 0; border-top: 1px solid var(--rule); }
+.reteach strong { color: var(--bad); font-size: 20px; }
+
 /* Language and theme buttons */
 .prefs { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; }
 .prefs button { background: var(--surface); color: var(--ink); border: 0; min-height: 40px; }

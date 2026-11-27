@@ -3,12 +3,12 @@ import { signIn, rest, fetchAll } from './api.js';
 import { hardest } from './core.js';
 import { LESSONS } from './lessons.js';
 import { el, configured } from './ui.js';
-import { cleanCode, where, students, studentRow, markItems, markRows, csvText, createDrafts } from './report.js';
+import { cleanCode, where, students, studentRow, markItems, markRows, csvText, createDrafts, overview } from './report.js';
 
 const KEY = 'pz:teacher-token';
 const app = document.getElementById('app'), message = document.getElementById('message');
 let token = null, lessons = [], groups = [];
-let group = '', lessonId = '', openKey = null;
+let group = '', lessonId = '', openKey = null, tab = 'class';
 // Grows with every new view, so a slow answer cannot draw over a newer one.
 let view = 0;
 // In memory only, so it outlives redraws and a new sign-in, not a reload.
@@ -89,7 +89,7 @@ async function start() {
       el('p', { textContent: 'This account is not a teacher account.' }), button('Sign out', () => signOut()));
   }
   lessons = await Promise.all(LESSONS.filter(l => l.quiz).map(async l => ({
-    label: l.no ? `${l.no}. ${l.title.en}` : l.title.en, quiz: (await import(`../quizzes/${l.quiz}.js`)).default,
+    no: l.no, label: l.no ? `${l.no}. ${l.title.en}` : l.title.en, quiz: (await import(`../quizzes/${l.quiz}.js`)).default,
   })));
   if (mine !== view) return;
   await loadGroups();
@@ -156,8 +156,13 @@ function showDashboard() {
         say(`Group ${gone} deleted.`, false);
       }, { className: 'danger' })),
     el('h2', { textContent: 'Results' }),
-    picker('Lesson', 'lesson', lessons.map(l => [l.quiz.id, l.label]), lessonId,
-      value => { lessonId = value; run(null, loadReport); }),
+    el('p', { className: 'actions tabs' }, ...[['class', 'Class overview'], ['lesson', 'One lesson']].map(([id, text]) => {
+      const node = button(text, async () => { tab = id; openKey = null; showDashboard(); await loadReport(); });
+      node.setAttribute('aria-pressed', String(tab === id));
+      return node;
+    })),
+    ...(tab === 'lesson' ? [picker('Lesson', 'lesson', lessons.map(l => [l.quiz.id, l.label]), lessonId,
+      value => { lessonId = value; run(null, loadReport); })] : []),
     el('p', { className: 'actions' }, button('Refresh', loadGroups), button('Download CSV (this group, all lessons)', downloadCSV)),
     el('p', { className: 'note', textContent: 'If Excel shows one column: Data > From Text/CSV, delimiter comma.' }),
     el('div', { id: 'report' }));
@@ -166,6 +171,7 @@ function showDashboard() {
 
 async function loadReport() {
   if (!group) return;
+  if (tab === 'class') return loadOverview();
   const mine = ++view, quiz = lessons.find(l => l.quiz.id === lessonId).quiz;
   const box = clear(document.getElementById('report'));
   box.append(el('p', { textContent: 'Loading…' }));
@@ -182,6 +188,77 @@ async function loadReport() {
   }
   if (mine !== view) return;
   showReport(clear(box), quiz, subs, marks);
+}
+
+async function loadOverview() {
+  const mine = ++view, filter = where({ group_code: group });
+  const box = clear(document.getElementById('report'));
+  box.append(el('p', { textContent: 'Loading…' }));
+  let subs, marks;
+  try {
+    [subs, marks] = await Promise.all([
+      fetchAll(`submissions?${filter}&order=checked_at,id`, token),
+      fetchAll(`marks?${filter}&order=name_key,quiz,qid`, token),
+    ]);
+  } catch (e) {
+    if (mine === view) clear(box).append(el('p', { textContent: 'The results did not load. Press Refresh.' }));
+    throw e;
+  }
+  if (mine !== view) return;
+  showOverview(clear(box), overview(lessons, subs, marks));
+}
+
+// From the overview to one student's answers in one lesson.
+async function openAnswers(lesson, key) {
+  tab = 'lesson';
+  lessonId = lesson.quiz.id;
+  openKey = key;
+  showDashboard();
+  await loadReport();
+  document.querySelector('#panel h3')?.focus();
+}
+
+function showOverview(box, { students: list, toMark, reteach }) {
+  if (!list.length) return box.append(el('p', { textContent: 'No answers from this group yet.' }));
+  const card = (value, text) => el('li', {}, el('strong', { textContent: value }), ` ${text}`);
+  const name = lesson => lesson.no ? `lesson ${lesson.no}` : lesson.label;
+  const rows = list.map(student => el('tr', {},
+    el('th', { scope: 'row' }, student.name, ...(student.behind ? [el('span', { className: 'flag', textContent: 'behind' })] : [])),
+    ...student.cells.map((c, i) => {
+      if (c.state === 'none') return el('td', { className: 'none', textContent: '·', title: 'Not started' });
+      const about = `${student.name}, ${name(lessons[i])}: ${c.state === 'done' ? 'finished' : 'started'}, ` +
+        `${c.best === null ? 'nothing checked' : `best ${c.best}`}${c.toMark ? ', needs marking' : ''}`;
+      const cell = button(String(c.best ?? '–'), () => openAnswers(lessons[i], student.key),
+        { className: `cell ${c.state}${c.toMark ? ' mark' : ''}`, title: about });
+      cell.setAttribute('aria-label', about);
+      return el('td', {}, cell);
+    }),
+    el('td', { className: 'sum', textContent: `${student.done} of ${lessons.length}` })));
+  const missed = reteach.map(r => {
+    const lesson = lessons[r.lesson], part = lesson.quiz.parts.find(p => p.id === r.part);
+    const q = part.items.find(i => i.id === r.qid);
+    const item = el('li', {}, el('strong', { textContent: `${r.pct}%` }),
+      ` ${lesson.label} · ${part.title.en.split(':')[0]}, ${r.qid} (${r.wrong} of ${r.n} missed)`);
+    if (q.prompt) item.append(el('p', { className: 'prompt', textContent: q.prompt.en }));
+    if (q.code) item.append(el('pre', { textContent: q.code }));
+    item.append(el('details', {}, el('summary', { textContent: 'See who' }),
+      el('p', { className: 'actions' }, ...r.who.map(w => button(w.name, () => openAnswers(lesson, w.key))))));
+    return item;
+  });
+  box.append(
+    el('ul', { className: 'cards' }, card(list.length, 'students with answers'),
+      card(list.filter(s => s.behind).length, 'more than 2 lessons behind the class'), card(toMark, 'written answers waiting for marks')),
+    el('h3', { textContent: 'Students and lessons' }),
+    el('p', { className: 'note', textContent: 'Those furthest behind come first. A square shows the best score; press it to open the answers. ' +
+      'Filled: finished. Outlined: started. Thick line underneath: needs marking.' }),
+    el('div', { className: 'scroll' }, el('table', { className: 'grid' },
+      el('thead', {}, el('tr', {}, el('th', { scope: 'col', textContent: 'Name' }),
+        ...lessons.map(l => el('th', { scope: 'col', textContent: l.no ?? '•', title: l.label })),
+        el('th', { scope: 'col', textContent: 'Finished' }))),
+      el('tbody', {}, ...rows))),
+    el('h3', { textContent: 'Reteach next' }),
+    el('p', { className: 'note', textContent: 'Questions most often missed on the first try, from those at least 3 students tried.' }),
+    missed.length ? el('ol', { className: 'reteach' }, ...missed) : el('p', { textContent: 'Nothing to show yet.' }));
 }
 
 function showReport(box, quiz, subs, marks) {

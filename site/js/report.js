@@ -68,6 +68,35 @@ export function markRows(group, key, quiz, items, values) {
   return rows.every(r => r.points >= 0 && r.points <= max(r.qid)) ? rows : null;
 }
 
+// The class at a glance, from one group's rows. `lessons`: [{ quiz }] in teaching order.
+export function overview(lessons, subs, marks) {
+  const byQuiz = lessons.map(({ quiz }) => students(subs.filter(s => s.quiz === quiz.id)));
+  const rows = students(subs).map(({ key, name }) => {
+    let toMark = 0;
+    const cells = lessons.map(({ quiz }, i) => {
+      const own = byQuiz[i].find(s => s.key === key);
+      if (!own) return { state: 'none' };
+      const row = studentRow(quiz, own, marks);
+      toMark += needsMarking(quiz, own.subs, marks.filter(m => m.name_key === key)).length;
+      return { state: row.finished ? 'done' : 'started', best: row.best, toMark: row.toMark };
+    });
+    return { key, name, cells, done: cells.filter(c => c.state === 'done').length, toMark };
+  }).sort((a, b) => a.done - b.done || a.name.localeCompare(b.name));
+  // Behind: more than 2 finished lessons below the middle student.
+  const middle = rows.length && (rows[Math.floor((rows.length - 1) / 2)].done + rows[Math.ceil((rows.length - 1) / 2)].done) / 2;
+  const reteach = lessons.flatMap(({ quiz }, lesson) => hardest(quiz, subs.filter(s => s.quiz === quiz.id))
+    // With fewer than 3 tries one student would top the list.
+    .filter(h => h.n >= 3 && h.wrong)
+    .map(h => ({ ...h, lesson, who: byQuiz[lesson].filter(s => hardest(quiz, s.subs).some(x => x.qid === h.qid && x.wrong))
+      .map(s => ({ key: s.key, name: s.name })) })))
+    .sort((a, b) => b.pct - a.pct || b.wrong - a.wrong).slice(0, 5);
+  return {
+    students: rows.map(({ toMark, ...s }) => ({ ...s, behind: s.done < middle - 2 })),
+    toMark: rows.reduce((t, s) => t + s.toMark, 0),
+    reteach,
+  };
+}
+
 // `lessons`: [{ label, quiz }].
 export function csvText(group, lessons, subs, marks) {
   const rows = lessons.flatMap(({ label, quiz }) => students(subs.filter(s => s.quiz === quiz.id)).map(student => {

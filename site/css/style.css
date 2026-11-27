@@ -119,8 +119,19 @@ progress::-moz-progress-bar { background: var(--go); }
 .stop.done .info > span:first-child { color: var(--go); }
 .stop.now .wave, .stop a:hover .wave { animation: wave 3.6s ease-in-out var(--d) infinite; }
 .stop.now .wave .f, .stop a:hover .wave .f { animation: glow 3.6s ease-in-out var(--d) infinite; }
-/* A finished stop's tower moves only while hovered. */
-.stop a:not(:hover) .figure .lit, .stop a:not(:hover) .figure .ghost { animation: none; }
+.stop.done .figure .t { fill: var(--go-top); }
+.stop.done .figure .s { fill: var(--go-side); }
+.stop.done .figure .f { stroke: var(--go); }
+/* A finished stop only moves: the glow starts from grey and would blink its green edges. */
+.stop.done a:hover .wave .f { animation: none; }
+/* Sign-in: centred under a finished tower. */
+.welcome { max-width: 340px; margin: 0 auto; text-align: center; }
+.welcome > .figure { height: 150px; margin: 16px 0; }
+.welcome h1 { margin: 0 0 4px; }
+.welcome .lead { margin: 0 0 20px; color: var(--ink-2); }
+.welcome label { text-align: left; }
+.welcome input { padding: 11px; border-radius: 10px; }
+.welcome button.go { width: 100%; padding: 12px; }
 /* The next lesson. Phone: only its button, fixed to the bottom, above the drawings and the theme animation. */
 .upnext { position: fixed; right: 0; bottom: 0; left: 0; z-index: 1002; padding: 12px 16px; background: var(--paper); }
 .upnext > :not(a) { display: none; }
@@ -129,14 +140,17 @@ body.home { padding-bottom: 100px; }
 .stop a { scroll-margin-bottom: 100px; }
 @media (min-width: 900px) {
   body.home { max-width: 1000px; padding-bottom: 60px; }
-  /* Sign-in stays where it sat on the narrower page. */
-  .home #app > h1, .home #app > form { margin-left: 120px; }
   .home .cols { display: grid; grid-template-columns: 300px minmax(0, 1fr); column-gap: 40px; align-items: start; }
   .path { --shift: 150px; margin-top: 16px; }
   .upnext { position: relative; margin-bottom: 24px; padding: 18px; border-radius: 16px; background: var(--surface); }
   .upnext > .figure { display: block; height: 140px; margin-bottom: 12px; }
   .upnext > p, .upnext > h2 { display: block; }
   .upnext h2 { margin: 0 0 16px; }
+}
+
+/* The next lesson stays in view while the path scrolls, unless the window is too short for the whole column. */
+@media (min-width: 900px) and (min-height: 560px) {
+  .home .cols > div:first-child { position: -webkit-sticky; position: sticky; top: 16px; }
 }
 
 /* Isometric drawings (figures.js) */
@@ -200,6 +214,21 @@ html.theme-fade, html.theme-fade * { transition: background-color .45s ease, bor
 .out { margin: 8px 0; max-height: 200px; overflow: auto; }
 .out:has(.chart) { max-height: none; }
 .chart { display: block; max-width: 100%; height: auto; background: #ffffff; border-radius: 6px; }
+
+/* Lesson page on a phone: the panel sits at the bottom of the screen even under a short question. */
+@media (max-width: 899px) {
+  body.lesson { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: 0; }
+  .lesson main, .lesson .stage:not([hidden]) { display: flex; flex-direction: column; flex: 1 0 auto; }
+  .lesson #notice, .lesson #status { margin: 4px 0; }
+  .lesson #notice:empty, .lesson #status:empty { margin: 0; }
+  .art { margin-bottom: 8px; }
+  .stage .panel { margin-top: auto; }
+}
+/* There the green button takes the whole width, above the others; short screens keep one compact row. */
+@media (max-width: 899px) and (min-height: 500px) {
+  .stage .panel .row button { flex: 1 1 30%; }
+  .stage .panel .row button.go { flex-basis: 100%; order: -1; }
+}
 
 /* Lesson page on wide screens: the question beside the drawing */
 @media (min-width: 900px) {

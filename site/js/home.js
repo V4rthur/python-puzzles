@@ -1,5 +1,4 @@
 import { LESSONS, loadQuizzes } from './lessons.js';
-import { earned } from './core.js';
 import { checkGroup } from './api.js';
 import { storage, getStudent, setStudent, clearStudent, load, progressRows, continueTarget } from './store.js';
 import { cover, tower, connector } from './figures.js';
@@ -70,12 +69,12 @@ function lessonList(student, loaded, heading) {
   const path = el('ol', { className: 'path' }, ...ready.map((row, i) => {
     const info = el('span', { className: 'info' }, tx(el('span'), STATES[row.state]));
     if (row.max != null) info.append(tx(el('span', { className: 'best' }), T(`Best ${row.best}/${row.max}`, `Eng yaxshi: ${row.best}/${row.max}`)));
-    // A finished stop shows the student's own tower and a tick; its "Done" text tells screen readers.
-    let art = [cover(row.quiz)];
+    // A finished stop's drawing turns green and gets a tick; its "Done" text tells screen readers.
+    const art = [cover(row.quiz)];
     if (row.state === 'done') {
-      const quiz = loaded[row.quiz], badge = el('span', { className: 'badge', textContent: '✓' });
+      const badge = el('span', { className: 'badge', textContent: '✓' });
       badge.setAttribute('aria-hidden', 'true');
-      art = [tower(quiz, earned(quiz, load(row.quiz).subs)), badge];
+      art.push(badge);
     }
     const stop = el('li', { className: 'stop' }, ...(i < ready.length - 1 ? [connector(offset(i), offset(i + 1))] : []),
       el('a', { href: href(row) }, el('span', { className: 'disc' }, ...art),
@@ -115,7 +114,17 @@ async function render() {
   const loaded = await quizzes, student = getStudent();
   app.textContent = '';
   const heading = tx(el('h1'), T('Python puzzles', 'Python boshqotirmalari'));
-  app.append(...(student ? [lessonList(student, loaded, heading)] : [heading, signIn()]));
+  app.append(student ? lessonList(student, loaded, heading) : welcome(loaded, heading));
+}
+
+// The first screen: a finished tower, what students will do, and the sign-in form.
+function welcome(loaded, heading) {
+  const quiz = loaded['lesson-01'], count = LESSONS.filter(l => l.quiz).length;
+  const art = quiz ? tower(quiz, new Set(quiz.parts.flatMap(p => p.items.map(q => q.id)))) : cover('lesson-01');
+  return el('div', { className: 'welcome' }, art, heading,
+    tx(el('p', { className: 'lead' }), T(`${count} lessons. Predict, fix and write code.`,
+      `${count} ta dars. Natijani taxmin qiling, kodni tuzating va yozing.`)),
+    signIn());
 }
 
 render();

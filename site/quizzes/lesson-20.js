@@ -14,8 +14,8 @@ const case_ = (data, expect) => ({ before: frame(data), expect: `E = ${expect}` 
 export default {
   id: 'lesson-20',
   title: T('The coffee chain', "Qahvaxonalar tarmog'i"),
-  intro: T('Lesson 20: grouping in Pandas · about 45 minutes · pairs. The first check downloads Pandas, so it takes longer. Predict first, compare with your partner, then press Check.',
-    "20-dars: Pandas da guruhlash · taxminan 45 daqiqa · juftlikda. Birinchi tekshiruvda Pandas yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Lesson 20: grouping in Pandas · about 45 minutes. The first check downloads Pandas, so it takes longer. Predict first, then press Check.',
+    "20-dars: Pandas da guruhlash · taxminan 45 daqiqa. Birinchi tekshiruvda Pandas yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: DF + 'print(df["qty"].sum())', answer: '15' },

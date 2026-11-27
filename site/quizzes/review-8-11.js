@@ -12,8 +12,8 @@ with open("people.csv", "w") as _f:
 export default {
   id: 'review-8-11',
   title: T('The CSV workshop', 'CSV ustaxonasi'),
-  intro: T('Practice for lessons 8–11: functions, files, exceptions, classes and modules · about 50 minutes · pairs. Predict first, compare with your partner, then press Check.',
-    "8–11-darslar bo'yicha amaliyot: funksiyalar, fayllar, istisnolar, klasslar va modullar · taxminan 50 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Practice for lessons 8–11: functions, files, exceptions, classes and modules · about 50 minutes. Predict first, then press Check.',
+    "8–11-darslar bo'yicha amaliyot: funksiyalar, fayllar, istisnolar, klasslar va modullar · taxminan 50 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'print(len("a,b,c".split(",")))', answer: '3' },

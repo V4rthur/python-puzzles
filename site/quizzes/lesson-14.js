@@ -31,8 +31,8 @@ const shop = (pages, expect) => ({
 export default {
   id: 'lesson-14',
   title: T('The silent server', 'Jim server'),
-  intro: T('Lesson 14: requests, APIs and JSON · about 45 minutes · pairs. The checker has no internet, so requests answers from a practice server. Predict first, compare with your partner, then press Check.',
-    "14-dars: requests, API va JSON · taxminan 45 daqiqa · juftlikda. Tekshiruvchida internet yo'q, shuning uchun requests mashq serveridan javob oladi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Lesson 14: requests, APIs and JSON · about 45 minutes. The checker has no internet, so requests answers from a practice server. Predict first, then press Check.',
+    "14-dars: requests, API va JSON · taxminan 45 daqiqa. Tekshiruvchida internet yo'q, shuning uchun requests mashq serveridan javob oladi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'import json\nprint(json.loads(\'{"a": 1}\')["a"])', answer: '1' },

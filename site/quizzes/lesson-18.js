@@ -10,8 +10,8 @@ const R2 = '[{"name": "Vali", "scor": 100}, {"name": "Nur", "scor": 40}, {"name"
 export default {
   id: 'lesson-18',
   title: T('The school register', 'Maktab jurnali'),
-  intro: T('Lesson 18: Pandas DataFrame · about 45 minutes · pairs. The first check downloads Pandas, so it takes longer. Predict first, compare with your partner, then press Check.',
-    "18-dars: Pandas DataFrame · taxminan 45 daqiqa · juftlikda. Birinchi tekshiruvda Pandas yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Lesson 18: Pandas DataFrame · about 45 minutes. The first check downloads Pandas, so it takes longer. Predict first, then press Check.',
+    "18-dars: Pandas DataFrame · taxminan 45 daqiqa. Birinchi tekshiruvda Pandas yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: DF + 'print(df.shape)', answer: '(3, 2)' },

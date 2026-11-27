@@ -7,8 +7,8 @@ const route = points => ({ before: `points = ${points}`, expect: '' });
 export default {
   id: 'lesson-11',
   title: T('The borrowed toolbox', 'Ijaraga olingan asboblar qutisi'),
-  intro: T('Lesson 11: modules, packages and virtual environments · about 35 minutes · pairs. Predict first, compare with your partner, then press Check. Your typing is saved in this browser.',
-    "11-dars: modullar, paketlar va virtual muhitlar · taxminan 35 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
+  intro: T('Lesson 11: modules, packages and virtual environments · about 35 minutes. Predict first, then press Check. Your typing is saved in this browser.',
+    "11-dars: modullar, paketlar va virtual muhitlar · taxminan 35 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'import math\nprint(math.sqrt(9))', answer: '3.0' },

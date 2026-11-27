@@ -18,8 +18,8 @@ const PRICES = '{"product": ["tea", "pie", "bun"], "price": [5.0, 12.0, 3.0]}';
 export default {
   id: 'lesson-22',
   title: T('The two spreadsheets', 'Ikkita elektron jadval'),
-  intro: T('Lesson 22: combining objects in Pandas · about 45 minutes · pairs. The first check downloads Pandas, so it takes longer. Predict first, compare with your partner, then press Check.',
-    "22-dars: Pandas da obyektlarni birlashtirish · taxminan 45 daqiqa · juftlikda. Birinchi tekshiruvda Pandas yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Lesson 22: combining objects in Pandas · about 45 minutes. The first check downloads Pandas, so it takes longer. Predict first, then press Check.',
+    "22-dars: Pandas da obyektlarni birlashtirish · taxminan 45 daqiqa. Birinchi tekshiruvda Pandas yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: AB + 'print(a.shape)', answer: '(2, 2)' },

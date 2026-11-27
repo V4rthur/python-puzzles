@@ -5,8 +5,8 @@ const BROKEN = 'class Account:\n    history = []\n\n    def __init__(self, owner
 export default {
   id: 'lesson-10',
   title: T('The mixed-up bank', 'Chalkashgan bank'),
-  intro: T('Lesson 10: classes · about 40 minutes · pairs. Predict first, compare with your partner, then press Check. Your typing is saved in this browser.',
-    "10-dars: klasslar · taxminan 40 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
+  intro: T('Lesson 10: classes · about 40 minutes. Predict first, then press Check. Your typing is saved in this browser.',
+    "10-dars: klasslar · taxminan 40 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'class A:\n    x = 1\nprint(A.x)', answer: '1' },

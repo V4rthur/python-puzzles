@@ -5,8 +5,8 @@ const BROKEN = 'def average(numbers):\n    total = 0\n    for n in numbers:\n   
 export default {
   id: 'lesson-08',
   title: T('The calculator that forgot', 'Unutuvchan kalkulyator'),
-  intro: T('Lesson 8: functions · about 35 minutes · pairs. Predict first, compare with your partner, then press Check. Your typing is saved in this browser.',
-    "8-dars: funksiyalar · taxminan 35 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
+  intro: T('Lesson 8: functions · about 35 minutes. Predict first, then press Check. Your typing is saved in this browser.',
+    "8-dars: funksiyalar · taxminan 35 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'def two():\n    return 2\nprint(two() + 1)', answer: '3' },

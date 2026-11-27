@@ -8,8 +8,8 @@ const plan = (today, expect) => ({ before: `${EVENTS}\ntoday = "${today}"`, expe
 export default {
   id: 'lesson-13',
   title: T('The lost schedule', "Yo'qolgan jadval"),
-  intro: T('Lesson 13: datetime and JSON · about 40 minutes · pairs. Predict first, compare with your partner, then press Check. Your typing is saved in this browser.',
-    "13-dars: datetime va JSON · taxminan 40 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
+  intro: T('Lesson 13: datetime and JSON · about 40 minutes. Predict first, then press Check. Your typing is saved in this browser.',
+    "13-dars: datetime va JSON · taxminan 40 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'from datetime import date\nprint(date(2026, 1, 5).year)', answer: '2026' },

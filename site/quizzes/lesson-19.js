@@ -14,8 +14,8 @@ const when = (frame, city, expect) => ({ before: `${frame}\ncity = "${city}"`, e
 export default {
   id: 'lesson-19',
   title: T("The detective's files", 'Tergovchining hujjatlari'),
-  intro: T('Lesson 19: selecting and filtering in Pandas · about 45 minutes · pairs. The first check downloads Pandas, so it takes longer. Predict first, compare with your partner, then press Check.',
-    "19-dars: Pandas da tanlash va filtrlash · taxminan 45 daqiqa · juftlikda. Birinchi tekshiruvda Pandas yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Lesson 19: selecting and filtering in Pandas · about 45 minutes. The first check downloads Pandas, so it takes longer. Predict first, then press Check.',
+    "19-dars: Pandas da tanlash va filtrlash · taxminan 45 daqiqa. Birinchi tekshiruvda Pandas yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: DF + 'print(df["age"].tolist())', answer: '[17, 25, 31, 22]' },

@@ -18,8 +18,8 @@ const PRICES = '[("tea", 5.0), ("pie", 12.0), ("bun", 3.0)]';
 export default {
   id: 'review-13-20',
   title: T('The data office', "Ma'lumotlar bo'limi"),
-  intro: T('Practice for lessons 13–20: dates, JSON, databases, NumPy and Pandas · about 55 minutes · pairs. The first check downloads the libraries. Predict first, compare with your partner, then press Check.',
-    "13–20-darslar bo'yicha amaliyot: sanalar, JSON, ma'lumotlar bazasi, NumPy va Pandas · taxminan 55 daqiqa · juftlikda. Birinchi tekshiruvda kutubxonalar yuklanadi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Practice for lessons 13–20: dates, JSON, databases, NumPy and Pandas · about 55 minutes. The first check downloads the libraries. Predict first, then press Check.',
+    "13–20-darslar bo'yicha amaliyot: sanalar, JSON, ma'lumotlar bazasi, NumPy va Pandas · taxminan 55 daqiqa. Birinchi tekshiruvda kutubxonalar yuklanadi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'import json\nprint(len(json.loads("[1, 2, 3]")))', answer: '3' },

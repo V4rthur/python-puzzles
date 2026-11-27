@@ -5,8 +5,8 @@ const BROKEN = 'days = 0\nfor km in runs:\n    total = 0\n    if km > 0:\n      
 export default {
   id: 'lesson-06',
   title: T('The marathon diary', 'Marafon kundaligi'),
-  intro: T('Lesson 6: loops · about 35 minutes · pairs. Predict first, compare with your partner, then press Check. Your typing is saved in this browser.',
-    "6-dars: sikllar · taxminan 35 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
+  intro: T('Lesson 6: loops · about 35 minutes. Predict first, then press Check. Your typing is saved in this browser.',
+    "6-dars: sikllar · taxminan 35 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'for i in range(3):\n    print(i)', answer: '0 1 2' },

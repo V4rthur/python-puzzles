@@ -4,8 +4,8 @@ const T = (en, uz) => ({ en, uz });
 export default {
   id: 'lesson-04',
   title: T('Who came to the party?', 'Ziyofatga kim keldi?'),
-  intro: T('Lesson 4: dictionaries and sets · about 30 minutes · pairs. Predict first, compare with your partner, then press Check. Your typing is saved in this browser.',
-    "4-dars: lug'atlar va to'plamlar · taxminan 30 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
+  intro: T('Lesson 4: dictionaries and sets · about 30 minutes. Predict first, then press Check. Your typing is saved in this browser.',
+    "4-dars: lug'atlar va to'plamlar · taxminan 30 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'd = {"a": 1}\nprint(d["a"])', answer: '1' },

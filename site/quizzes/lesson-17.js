@@ -11,8 +11,8 @@ const days = (data, expect) => ({
 export default {
   id: 'lesson-17',
   title: T('The weather station', 'Ob-havo stansiyasi'),
-  intro: T('Lesson 17: NumPy and Pandas Series · about 45 minutes · pairs. The first check downloads the libraries, so it takes longer. Predict first, compare with your partner, then press Check.',
-    "17-dars: NumPy va Pandas Series · taxminan 45 daqiqa · juftlikda. Birinchi tekshiruvda kutubxonalar yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Lesson 17: NumPy and Pandas Series · about 45 minutes. The first check downloads the libraries, so it takes longer. Predict first, then press Check.',
+    "17-dars: NumPy va Pandas Series · taxminan 45 daqiqa. Birinchi tekshiruvda kutubxonalar yuklanadi, shuning uchun uzoqroq davom etadi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: NP + 'a = np.array([1, 2, 3])\nprint((a * 2).tolist())', answer: '[2, 4, 6]' },

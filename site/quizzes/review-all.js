@@ -6,8 +6,8 @@ const library = (csv, expect) => ({ before: `csv_text = ${JSON.stringify(csv)}`,
 export default {
   id: 'review-all',
   title: T('The final mission', 'Yakuniy topshiriq'),
-  intro: T('Overall practice: the whole course · about 60 minutes · pairs. Predict first, compare with your partner, then press Check.',
-    "Umumiy amaliyot: butun kurs · taxminan 60 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Overall practice: the whole course · about 60 minutes. Predict first, then press Check.',
+    "Umumiy amaliyot: butun kurs · taxminan 60 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'print(type(3 / 1).__name__)', answer: 'float' },

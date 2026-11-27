@@ -11,8 +11,8 @@ const shops = (data, expect) => ({ before: `${START}df = pd.DataFrame(${data})`,
 export default {
   id: 'lesson-23',
   title: T('The chart studio', 'Diagrammalar ustaxonasi'),
-  intro: T('Lesson 23: Matplotlib with NumPy and Pandas · about 45 minutes · pairs. Press Run to see your chart. The first run downloads the libraries, so it takes longer.',
-    "23-dars: Matplotlib, NumPy va Pandas bilan · taxminan 45 daqiqa · juftlikda. Diagrammangizni ko'rish uchun Ishga tushirish tugmasini bosing. Birinchi ishga tushirishda kutubxonalar yuklanadi, shuning uchun uzoqroq davom etadi."),
+  intro: T('Lesson 23: Matplotlib with NumPy and Pandas · about 45 minutes. Press Run to see your chart. The first run downloads the libraries, so it takes longer.',
+    "23-dars: Matplotlib, NumPy va Pandas bilan · taxminan 45 daqiqa. Diagrammangizni ko'rish uchun Ishga tushirish tugmasini bosing. Birinchi ishga tushirishda kutubxonalar yuklanadi, shuning uchun uzoqroq davom etadi."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: AX + 'ax.plot([1, 2, 3])\nprint(len(ax.lines))', answer: '1' },

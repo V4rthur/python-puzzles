@@ -4,8 +4,8 @@ const T = (en, uz) => ({ en, uz });
 export default {
   id: 'review-1-6',
   title: T('The café that lost its orders', "Buyurtmalarini yo'qotgan kafe"),
-  intro: T('Review of lessons 1–6 · about 40 minutes · pairs. Predict first, compare with your partner, then press Check. Your typing is saved in this browser.',
-    "1–6-darslarni takrorlash · taxminan 40 daqiqa · juftlikda. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
+  intro: T('Review of lessons 1–6 · about 40 minutes. Predict first, then press Check. Your typing is saved in this browser.',
+    "1–6-darslarni takrorlash · taxminan 40 daqiqa. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing. Yozganlaringiz shu brauzerda saqlanadi."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'print(17 // 5, 17 % 5)', answer: '3 2' },

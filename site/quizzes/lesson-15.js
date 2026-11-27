@@ -13,8 +13,8 @@ const table = (rows, expect) => page(`<table><tr><th>Name</th><th>Price</th></tr
 export default {
   id: 'lesson-15',
   title: T('The web detective', 'Veb-tergovchi'),
-  intro: T('Lesson 15: web scraping and Selenium · about 45 minutes · pairs. You practise on saved pages. The first check downloads Beautiful Soup. Predict first, compare with your partner, then press Check.',
-    "15-dars: veb-skreyping va Selenium · taxminan 45 daqiqa · juftlikda. Saqlangan sahifalarda mashq qilasiz. Birinchi tekshiruvda Beautiful Soup yuklanadi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Lesson 15: web scraping and Selenium · about 45 minutes. You practise on saved pages. The first check downloads Beautiful Soup. Predict first, then press Check.',
+    "15-dars: veb-skreyping va Selenium · taxminan 45 daqiqa. Saqlangan sahifalarda mashq qilasiz. Birinchi tekshiruvda Beautiful Soup yuklanadi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: LIST + 'print(soup.li.text)', answer: 'A' },

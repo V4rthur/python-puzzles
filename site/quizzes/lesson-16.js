@@ -18,8 +18,8 @@ new = ${row}`,
 export default {
   id: 'lesson-16',
   title: T('The library catalogue', 'Kutubxona katalogi'),
-  intro: T('Lesson 16: databases with SQLite · about 45 minutes · pairs. The first check downloads SQLite, so it takes a little longer. Predict first, compare with your partner, then press Check.',
-    "16-dars: SQLite ma'lumotlar bazasi · taxminan 45 daqiqa · juftlikda. Birinchi tekshiruvda SQLite yuklanadi, shuning uchun biroz uzoqroq davom etadi. Avval natijani taxmin qiling, sherigingiz bilan solishtiring, keyin Tekshirish tugmasini bosing."),
+  intro: T('Lesson 16: databases with SQLite · about 45 minutes. The first check downloads SQLite, so it takes a little longer. Predict first, then press Check.',
+    "16-dars: SQLite ma'lumotlar bazasi · taxminan 45 daqiqa. Birinchi tekshiruvda SQLite yuklanadi, shuning uchun biroz uzoqroq davom etadi. Avval natijani taxmin qiling, keyin Tekshirish tugmasini bosing."),
   parts: [
     { id: 'warmup', title: T('Warm-up: what is printed? (not scored)', "Mashq: ekranga nima chiqadi? (baholanmaydi)"), items: [
       { id: 'w1', type: 'predict', points: 0, code: 'import sqlite3\ncon = sqlite3.connect(":memory:")\nprint(con.execute("SELECT 2 + 3").fetchone())', answer: '(5,)' },

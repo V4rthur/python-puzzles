@@ -1,8 +1,8 @@
 /* Hex only: the theme animation's snapshot library cannot read oklch(). */
 :root { --paper: #f5f7fc; --surface: #e9edf7; --surface-2: #dce2f0; --rule: #cbd3e6; --ink: #131a2b; --ink-2: #4f5972; --field: #ffffff;
-  --line: #46506b; --top: #ffffff; --side: #dfe5f3; --go: #11794a; --go-ink: #ffffff; --go-top: #bfead2; --go-side: #8fd3b0; --go-lip: #0b5c36; --bad: #b3261e; color-scheme: light; }
+  --line: #46506b; --top: #ffffff; --side: #dfe5f3; --go: #11794a; --go-ink: #ffffff; --go-top: #bfead2; --go-side: #8fd3b0; --go-lip: #0b5c36; --bad: #b3261e; --ok-wash: #e3f5ec; --no-wash: #fbe9e7; color-scheme: light; }
 :root[data-theme="dark"] { --paper: #0d1220; --surface: #151c2e; --surface-2: #1f2840; --rule: #2a3452; --ink: #e8ecf5; --ink-2: #96a0ba; --field: #151c2e;
-  --line: #7e8aa8; --top: #212b47; --side: #161e33; --go: #7ee2a8; --go-ink: #06130c; --go-top: #24604a; --go-side: #173f33; --go-lip: #3f9e6c; --bad: #ff8f84; color-scheme: dark; }
+  --line: #7e8aa8; --top: #212b47; --side: #161e33; --go: #7ee2a8; --go-ink: #06130c; --go-top: #24604a; --go-side: #173f33; --go-lip: #3f9e6c; --bad: #ff8f84; --ok-wash: #12302a; --no-wash: #2a1c27; color-scheme: dark; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0 auto; max-width: 760px; padding: 16px 16px 60px; background: var(--paper); color: var(--ink); font: 15px/1.5 "Segoe UI", system-ui, sans-serif; overflow-wrap: break-word; }
@@ -17,7 +17,7 @@ header { display: flex; justify-content: space-between; align-items: flex-start;
 header a { flex: none; }
 header span#who { min-width: 0; margin-left: 16px; text-align: right; color: var(--ink-2); }
 
-pre, textarea.code, input.code { font-family: Consolas, ui-monospace, monospace; }
+pre, textarea.code, input.code, .keys button { font-family: Consolas, ui-monospace, monospace; }
 pre { background: var(--surface); border-radius: 6px; padding: 12px 14px; white-space: pre-wrap; font-size: 14px; line-height: 1.45; }
 label { display: block; margin: 8px 0; }
 /* 16px: smaller text makes iPhones zoom in on focus. */
@@ -64,21 +64,38 @@ progress::-moz-progress-bar { background: var(--go); }
 .steps button[aria-current] { background-size: 100% 18px; }
 .steps button[aria-current]:not(.done) { background-image: linear-gradient(var(--ink-2), var(--ink-2)); }
 .crumb { margin: 0 0 4px; color: var(--ink-2); font-size: 14px; font-weight: 400; line-height: 1.4; letter-spacing: 0; }
+/* Code keys: touch screens only, six to a row. */
+.keys { display: none; }
+@media (pointer: coarse) {
+  /* touch-action: a double tap on a key or a gap must not zoom the page. It covers the buttons inside too. */
+  .keys { display: grid; grid-template-columns: repeat(6, 1fr); grid-gap: 6px; margin: 0 0 8px; touch-action: manipulation; }
+  .keys button { min-height: 40px; padding: 0; }
+}
 /* Phone: the task, then the picture, then the buttons, which stick to the bottom of the screen. */
 .stage { display: flex; flex-direction: column; }
 .task { display: contents; }
 .task h2 { margin: 8px 0 4px; font-size: 1.75rem; }
 .art { background: var(--surface); border-radius: 16px; padding: 16px; margin-top: 12px; display: flex; flex-direction: column; justify-content: center; }
-/* Room for the sticky buttons when something is scrolled into view (ignored before Safari 14.1). */
-.art, .stage .fb, .stage .out, .stage input, .stage textarea, .stage summary { scroll-margin-bottom: 120px; }
+/* Room for the sticky panel when something is scrolled into view (ignored before Safari 14.1). */
+.art, .stage .out, .stage input, .stage textarea, .stage details { scroll-margin-bottom: calc(40vh + 12px); }
 .art .figure { max-height: 240px; }
 .art pre, .stage pre { background: var(--surface); }
 .row { display: flex; flex-wrap: wrap; margin-top: 8px; }
 .row button { margin: 0 8px 8px 0; }
+.panel .fb:empty { margin: 0; }
+.panel strong { display: block; font-size: 1.15rem; }
+.panel.right, .panel.wrong { border-top: 2px solid var(--go); background: var(--ok-wash); }
+.panel.wrong { border-top-color: var(--bad); background: var(--no-wash); }
 /* Above the drawings (1001) and, being data-ink-live, above the theme animation. */
-.stage .row { order: 1; position: -webkit-sticky; position: sticky; bottom: 0; z-index: 1002; margin: 0 -16px; padding: 10px 8px 2px 16px; background: var(--paper); }
+.stage .panel { order: 1; position: -webkit-sticky; position: sticky; bottom: 0; z-index: 1002; display: flex; flex-direction: column; max-height: 40vh; margin: 8px -16px 0; padding: 4px 8px 2px 16px; }
+/* The paper colour only where no result tints the panel. */
+.stage .panel:not(.right):not(.wrong) { background: var(--paper); }
+/* A long message scrolls; the buttons stay. */
+.stage .panel .fb { min-height: 0; overflow: auto; }
+.stage .panel .row { flex: none; }
 .finish { text-align: center; max-width: 420px; margin: 0 auto; }
 .finish .figure { max-height: 320px; }
+.finish .choices button { display: block; width: 100%; margin: 0 0 12px; }
 
 /* Home: the lessons are stops on a winding path. --shift is how far the path swings. */
 .path { --shift: 40px; list-style: none; padding: 0; margin: 0 0 32px; }
@@ -94,9 +111,7 @@ progress::-moz-progress-bar { background: var(--go); }
 /* A border, not a box-shadow ring: the theme animation's snapshot paints that as a solid block. */
 .stop.now .disc { border-color: var(--go); }
 .stop .figure { height: 100%; }
-.stop.done .figure .f { stroke: var(--go); }
-.stop.done .figure .t { fill: var(--go-top); }
-.stop.done .figure .s { fill: var(--go-side); }
+.badge { position: absolute; top: -10px; right: -10px; z-index: 1002; width: 28px; height: 28px; border: 3px solid var(--paper); border-radius: 50%; background: var(--go); color: var(--go-ink); font-size: 14px; font-weight: 800; line-height: 22px; text-align: center; }
 .stop .text { display: flex; flex-direction: column; justify-content: center; flex: 1; min-width: 0; min-height: 80px; margin-left: 12px; }
 .stop .title { font-weight: 600; line-height: 1.3; }
 .stop .info { max-width: none; margin: 4px 0 0; text-align: left; color: var(--ink-2); }
@@ -104,8 +119,8 @@ progress::-moz-progress-bar { background: var(--go); }
 .stop.done .info > span:first-child { color: var(--go); }
 .stop.now .wave, .stop a:hover .wave { animation: wave 3.6s ease-in-out var(--d) infinite; }
 .stop.now .wave .f, .stop a:hover .wave .f { animation: glow 3.6s ease-in-out var(--d) infinite; }
-/* The glow starts from grey, so a finished drawing only moves. */
-.stop.done a:hover .wave .f { animation: none; }
+/* A finished stop's tower moves only while hovered. */
+.stop a:not(:hover) .figure .lit, .stop a:not(:hover) .figure .ghost { animation: none; }
 /* The next lesson. Phone: only its button, fixed to the bottom, above the drawings and the theme animation. */
 .upnext { position: fixed; right: 0; bottom: 0; left: 0; z-index: 1002; padding: 12px 16px; background: var(--paper); }
 .upnext > :not(a) { display: none; }
@@ -192,7 +207,9 @@ html.theme-fade, html.theme-fade * { transition: background-color .45s ease, bor
   .lesson .intro { max-width: 70ch; }
   .stage { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; align-items: start; }
   .task { display: block; }
-  .stage .row { position: relative; margin: 8px 0 0; padding: 0; }
+  .stage .panel { position: relative; display: block; max-height: none; margin: 8px 0 0; padding: 0; }
+  .stage .panel.right, .stage .panel.wrong { padding: 4px 8px 0 14px; border-radius: 6px; }
+  .stage .panel:not(.right):not(.wrong) { background: none; }
   .art { min-height: 380px; margin: 0; }
   .art .figure { max-height: 330px; }
 }

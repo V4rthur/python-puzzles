@@ -26,3 +26,7 @@ export const LESSONS = [
   L(23, 'Matplotlib(NumPy+pandas)', 'Matplotlib (NumPy + pandas)', 'lesson-23'),
   L(24, 'Overall Practice', 'Umumiy amaliyot', 'review-all'),
 ];
+
+// Every puzzle by id; a file that fails to load is null, which only costs its lesson the score.
+export const loadQuizzes = () => Promise.all(LESSONS.filter(l => l.quiz).map(l =>
+  import(`../quizzes/${l.quiz}.js`).then(m => [l.quiz, m.default], () => [l.quiz, null]))).then(Object.fromEntries);

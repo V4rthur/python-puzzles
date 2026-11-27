@@ -1,6 +1,7 @@
 // Isometric line drawings: lesson covers, the progress tower and pictures of what code does.
 // `data-ink-live` keeps them out of the theme animation's snapshot, which cannot draw CSS-styled SVG.
 import { pointsOf } from './core.js';
+import { fill } from './ui.js';
 
 const S = (tag, attrs = {}, ...kids) => {
   const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -113,7 +114,7 @@ export const EXPLAIN = {
     const columns = [3, 5, 2].map((value, i) => {
       const x = i * 56 - 56, bar = S('g', {}, move(box(34, 34, 4), x, -x, 0));
       const [X, Y] = iso(x + 17, -x + 17, 0);
-      later(500 + i * 300, () => { bar.replaceChildren(move(box(34, 34, value * 18), x, -x, 0)); lit(bar); });
+      later(500 + i * 300, () => { fill(bar, move(box(34, 34, value * 18), x, -x, 0)); lit(bar); });
       return [bar, label(X, Y + 44, `${'abc'[i]} = ${value}`)];
     });
     return canvas('-180 -127 360 230', ...columns.flat());
@@ -318,7 +319,7 @@ export const EXPLAIN = {
       const bar = S('g', {}, move(box(36, 36, height), x, -x, 0));
       const [X, Y] = iso(x + 18, -x + 18, 0);
       const out = label(X, Y + 46, name);
-      later(700, () => { bar.replaceChildren(move(box(36, 36, to), x, -x, 0)); lit(bar); out.textContent = result; });
+      later(700, () => { fill(bar, move(box(36, 36, to), x, -x, 0)); lit(bar); out.textContent = result; });
       return [bar, out];
     };
     return canvas('-170 -124 340 220', ...column(-65, 95, 'int(7.9)', 84, '7'), ...column(0, 95, 'round(7.9)', 96, '8'), ...column(65, 72, '6 / 3', 24, '2.0'));

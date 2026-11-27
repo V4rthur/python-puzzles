@@ -12,6 +12,12 @@ export function el(tag, props = {}, ...kids) {
   return node;
 }
 
+// Replaces everything inside a node, SVG too. The built-in method for this needs Safari 14.
+export function fill(node, ...kids) {
+  node.textContent = '';
+  node.append(...kids);
+}
+
 // Replaces the node's content with both languages; the language button decides which one shows.
 export function tx(node, text) {
   node.textContent = '';
@@ -53,13 +59,49 @@ export function startSync(node, storage) {
 // The server refuses a level over 20000 characters of JSON for good (db/setup.sql), so stop well before that.
 export const tooLong = answers => JSON.stringify(answers).length > 15000;
 
+export const towersBuilt = (done, total) => T(`${done} of ${total} towers built`, `${total} ta minoradan ${done} tasi qurildi`);
+
 export const tabLabel = title => T(title.en.split(':')[0], title.uz.split(':')[0]);
 
 const HEADINGS = { predict: T('What is printed?', 'Ekranga nima chiqadi?'), code: T('Write the code', 'Kodni yozing'), written: T('Explain', 'Tushuntiring') };
 export const heading = type => HEADINGS[type];
 
+// What the panel under the answer says after a check. A written answer has no checker message.
+export function panelState(result, message) {
+  if (!message) return 'saved';
+  if (message.ok) return 'right';
+  return result == null ? 'unchecked' : 'wrong';
+}
+
+const TITLES = { right: T('✓ Correct', "✓ To'g'ri"), wrong: T('✗ Not yet', "✗ Hali to'g'ri emas") };
+
+export function panelText(item, state, message) {
+  const title = TITLES[state] ?? null, n = pointsOf(item);
+  if (state === 'saved')
+    return { title, body: n ? T('Saved. Your teacher will read it.', "Saqlandi. O'qituvchingiz o'qiydi.") : T('Saved.', 'Saqlandi.') };
+  if (state === 'right') {
+    const lines = n ? [T(`${n} point${n === 1 ? '' : 's'}`, `${n} ball`)] : [];
+    // "correct" repeats the title and a code score repeats the points; only what Python prints is news.
+    if (item.type === 'predict' && message.en !== 'correct') lines.push(message);
+    return { title, body: lines.length ? T(lines.map(l => l.en).join('\n'), lines.map(l => l.uz).join('\n')) : null };
+  }
+  const repeats = state === 'wrong' && message.en === 'not yet';
+  return { title, body: repeats ? null : T(message.en, message.uz) };
+}
+
 // What Enter should indent the next line with, given the current line up to the cursor.
 export const indentAfter = line => line.match(/^ */)[0] + (line.trimEnd().endsWith(':') ? '    ' : '');
+
+// The keys under a code box, for characters that are slow to reach on a phone keyboard. The last one indents.
+export const CODE_KEYS = ['(', ')', '[', ']', ':', '=', '"', '_', '.', '/', '%', '    '];
+
+// Puts text at the cursor, over any selection. False, with nothing changed, if it would pass the length limit.
+export function typeKey(field, text) {
+  const { selectionStart: start, selectionEnd: end } = field;
+  if (field.value.length - (end - start) + text.length > field.maxLength) return false;
+  field.setRangeText(text, start, end, 'end'); // does not apply maxLength by itself
+  return true;
+}
 
 // crypto.randomUUID is missing before Safari 15.4 and on plain http.
 export function makeId(source = globalThis.crypto) {

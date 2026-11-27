@@ -1,8 +1,9 @@
-import { LESSONS } from './lessons.js';
+import { LESSONS, loadQuizzes } from './lessons.js';
+import { earned } from './core.js';
 import { checkGroup } from './api.js';
 import { storage, getStudent, setStudent, clearStudent, load, progressRows, continueTarget } from './store.js';
-import { cover, connector } from './figures.js';
-import { T, el, tx, configured, NOT_CONFIGURED, startSync } from './ui.js';
+import { cover, tower, connector } from './figures.js';
+import { T, el, tx, configured, NOT_CONFIGURED, startSync, towersBuilt } from './ui.js';
 
 const app = document.getElementById('app');
 const STATES = {
@@ -18,9 +19,7 @@ const OFFSETS = [0, 1, .35, .9, .2];
 
 startSync(document.getElementById('status'), storage);
 
-// A lesson file that fails to load only costs that row its score.
-const quizzes = Promise.all(LESSONS.filter(l => l.quiz).map(l =>
-  import(`../quizzes/${l.quiz}.js`).then(m => [l.quiz, m.default], () => [l.quiz, null]))).then(Object.fromEntries);
+const quizzes = loadQuizzes();
 
 function signIn() {
   const code = el('input', { id: 'code', required: true, maxLength: 20, autocomplete: 'off', spellcheck: false });
@@ -71,8 +70,15 @@ function lessonList(student, loaded, heading) {
   const path = el('ol', { className: 'path' }, ...ready.map((row, i) => {
     const info = el('span', { className: 'info' }, tx(el('span'), STATES[row.state]));
     if (row.max != null) info.append(tx(el('span', { className: 'best' }), T(`Best ${row.best}/${row.max}`, `Eng yaxshi: ${row.best}/${row.max}`)));
+    // A finished stop shows the student's own tower and a tick; its "Done" text tells screen readers.
+    let art = [cover(row.quiz)];
+    if (row.state === 'done') {
+      const quiz = loaded[row.quiz], badge = el('span', { className: 'badge', textContent: '✓' });
+      badge.setAttribute('aria-hidden', 'true');
+      art = [tower(quiz, earned(quiz, load(row.quiz).subs)), badge];
+    }
     const stop = el('li', { className: 'stop' }, ...(i < ready.length - 1 ? [connector(offset(i), offset(i + 1))] : []),
-      el('a', { href: href(row) }, el('span', { className: 'disc' }, cover(row.quiz)),
+      el('a', { href: href(row) }, el('span', { className: 'disc' }, ...art),
         el('span', { className: 'text' }, tx(el('span', { className: 'title' }), title(row)), info)));
     stop.style.setProperty('--o', offset(i));
     if (row.state === 'done') stop.classList.add('done');
@@ -100,7 +106,7 @@ function lessonList(student, loaded, heading) {
     el('p', { className: 'who' }, el('strong', { textContent: student.name }), ` · ${student.code} `, out),
     el('div', { className: 'cols' },
       el('div', {}, heading, ...(next ? [next] : []),
-        tx(el('p', { className: 'progress' }), T(`${done} of ${total} done`, `${total} tadan ${done} tasi bajarildi`)),
+        tx(el('p', { className: 'progress' }), towersBuilt(done, total)),
         bar),
       el('div', {}, path, ...(soon.childElementCount ? [tx(el('h2'), T('Coming soon', 'Tez orada')), soon] : []))));
 }

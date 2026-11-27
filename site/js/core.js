@@ -12,6 +12,10 @@ export const autoMax = quiz => autoItems(quiz).reduce((t, q) => t + pointsOf(q),
 export const scoredParts = quiz => quiz.parts
   .filter(p => p.id !== 'warmup' && p.items.some(q => pointsOf(q) > 0)).map(p => p.id);
 
+// Ids of the tower blocks a student earned: auto-scored questions that ever got full points.
+export const earned = (quiz, subs) => new Set(autoItems(quiz)
+  .filter(q => subs.some(s => s.part === q.part && s.results?.[q.id] === pointsOf(q))).map(q => q.id));
+
 export const nameKey = name => name.trim().replace(/\s+/g, ' ').toLowerCase();
 
 export const isFilled = (item, value = '') =>

@@ -4,8 +4,9 @@ const SUN = 'M12 7a5 5 0 1 1 0 10a5 5 0 1 1 0-10z';
 const MOON = 'M20.5 13.2A8.5 8.5 0 1 1 10.8 3.5a7.2 7.2 0 0 0 9.7 9.7z';
 const RAYS = [[12, 1.5, 12, 3.5], [12, 20.5, 12, 22.5], [1.5, 12, 3.5, 12], [20.5, 12, 22.5, 12],
   [4.58, 4.58, 6, 6], [18, 18, 19.42, 19.42], [4.58, 19.42, 6, 18], [18, 6, 19.42, 4.58]];
-const WAIT_MS = 2500;
+const WAIT_MS = 5000; // loading the libraries and taking both snapshots
 const COVER_MS = 5000;
+const FRESH_MS = 3000; // older snapshots may no longer match the page
 
 const svg = (tag, attrs) => {
   const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -47,18 +48,31 @@ export function themeSwitch(onChange) {
   }));
   const timeout = () => new Promise((_, reject) => setTimeout(() => reject(new Error('slow')), WAIT_MS));
 
+
+  const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // The snapshots take a moment, so they start as soon as the pointer or focus reaches the button.
+  let ready = null, since = 0;
+  const prepare = () => {
+    if (ready && performance.now() - since < FRESH_MS) return ready;
+    since = performance.now();
+    return (ready = (async () => {
+      ink = ink || await load();
+      if (ink.isAnimating) return;
+      root.dataset.rev = Number(root.dataset.rev || 0) + 1;
+      await ink.captureAll();
+    })());
+  };
+  // A failure here is reported by the click, which waits on the same promise.
+  button.onpointerenter = button.onpointerdown = button.onfocus = () => { if (!busy && !calm()) prepare().catch(() => {}); };
+
   button.onclick = async e => {
     if (busy) return;
     busy = true;
     const want = dark() ? 'light' : 'dark';
     const point = e.detail === 0 ? undefined : { x: e.clientX, y: e.clientY };
     try {
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) throw new Error('reduced motion');
-      ink = ink || await Promise.race([load(), timeout()]);
-      if (!ink.isAnimating) {
-        root.dataset.rev = Number(root.dataset.rev || 0) + 1;
-        await Promise.race([ink.captureAll(), timeout()]);
-      }
+      if (calm()) throw new Error('reduced motion');
+      await Promise.race([prepare(), timeout()]);
       ink.toggle(point);
       // If frames stall (slow phone, hidden tab), never leave the snapshot covering the live page.
       clearTimeout(cover);
@@ -67,7 +81,7 @@ export function themeSwitch(onChange) {
       root.dataset.theme = want;
       if (ink) ink.icon.set(want); else pose();
       button.setAttribute('aria-pressed', String(want === 'dark'));
-    } finally { busy = false; }
+    } finally { busy = false; ready = null; } // the page may change before the next click
     onChange(want);
   };
   return button;

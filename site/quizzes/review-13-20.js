@@ -26,10 +26,10 @@ export default {
       { id: 'w2', type: 'predict', points: 0, code: 'import numpy as np\nprint(np.mean([2, 4]))', answer: '3.0' },
     ]},
     { id: 'l1', title: T('Level 1: one question per tool (4 points)', "1-bosqich: har bir vositaga bitta savol (4 ball)"), cls: 'c1', items: [
-      { id: 'p1', type: 'predict', code: 'from datetime import date\nd = date.fromisoformat("2026-03-02")\nprint(d.month, d.day)', answer: '3 2' },
-      { id: 'p2', type: 'predict', code: 'import sqlite3\ncon = sqlite3.connect(":memory:")\nq = "SELECT SUM(x) FROM (SELECT 2 AS x UNION ALL SELECT 3)"\nprint(con.execute(q).fetchone())', answer: '(5,)' },
-      { id: 'p3', type: 'predict', code: 'import numpy as np\na = np.array([[1, 2], [3, 4]])\nprint(a.sum(axis=0).tolist())', answer: '[4, 6]' },
-      { id: 'p4', type: 'predict', code: 'import pandas as pd\ndf = pd.DataFrame({"k": ["x", "y", "x"], "v": [1, 2, 3]})\nprint(df.groupby("k")["v"].sum().to_dict())', answer: "{'x': 4, 'y': 2}" },
+      { id: 'p1', type: 'predict', code: 'from datetime import date\nd = date.fromisoformat("2026-03-02")\nprint(d.month, d.day)', answer: '3 2', show: 'dateparts', why: T("month and day are numbers, so 03 prints as 3.", "month va day sonlar, shuning uchun 03 3 bo'lib chiqadi.") },
+      { id: 'p2', type: 'predict', code: 'import sqlite3\ncon = sqlite3.connect(":memory:")\nq = "SELECT SUM(x) FROM (SELECT 2 AS x UNION ALL SELECT 3)"\nprint(con.execute(q).fetchone())', answer: '(5,)', show: 'sqlsum', why: T("SUM adds the rows into one. fetchone returns that row as a tuple.", "SUM qatorlarni bittaga qo'shadi. fetchone shu qatorni kortej qilib qaytaradi.") },
+      { id: 'p3', type: 'predict', code: 'import numpy as np\na = np.array([[1, 2], [3, 4]])\nprint(a.sum(axis=0).tolist())', answer: '[4, 6]', show: 'columns', why: T("axis=0 adds down each column.", "axis=0 har bir ustunni yuqoridan pastga qo'shadi.") },
+      { id: 'p4', type: 'predict', code: 'import pandas as pd\ndf = pd.DataFrame({"k": ["x", "y", "x"], "v": [1, 2, 3]})\nprint(df.groupby("k")["v"].sum().to_dict())', answer: "{'x': 4, 'y': 2}", show: 'groupsum', why: T("Rows with the same k are added together.", "k qiymati bir xil qatorlar qo'shiladi.") },
     ]},
     { id: 'l2', title: T('Level 2: the broken revenue (3 points)', '2-bosqich: buzilgan tushum hisobi (3 ball)'), cls: 'c2', items: [
       { id: 'why', type: 'written',

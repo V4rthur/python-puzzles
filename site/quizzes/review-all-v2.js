@@ -17,10 +17,10 @@ export default {
       { id: 'w2', type: 'predict', points: 0, code: 'print(len({"a": 1, "b": 2}))', answer: '2' },
     ]},
     { id: 'l1', title: T('Level 1: look closely (4 points)', "1-bosqich: diqqat bilan qarang (4 ball)"), cls: 'c1', items: [
-      { id: 'p1', type: 'predict', code: 'import sqlite3\ncon = sqlite3.connect(":memory:")\ncon.execute("CREATE TABLE t (name TEXT, qty INT)")\ncon.executemany("INSERT INTO t VALUES (?, ?)", [("tea", 2), ("pie", 5), ("tea", 4)])\nprint(con.execute("SELECT name, SUM(qty) FROM t GROUP BY name ORDER BY name").fetchall())', answer: "[('pie', 5), ('tea', 6)]" },
-      { id: 'p2', type: 'predict', code: 'import pandas as pd\ndf = pd.DataFrame({"city": ["A", "B", "A"], "temp": [10, 30, 20]})\nprint(df[df["temp"] > 15]["city"].tolist())', answer: "['B', 'A']" },
-      { id: 'p3', type: 'predict', code: 'd = {"a": [1]}\ne = d.copy()\ne["a"].append(2)\nprint(d["a"])', answer: '[1, 2]' },
-      { id: 'p4', type: 'predict', code: 'try:\n    [1][5]\nexcept LookupError as error:\n    print(type(error).__name__)', answer: 'IndexError' },
+      { id: 'p1', type: 'predict', code: 'import sqlite3\ncon = sqlite3.connect(":memory:")\ncon.execute("CREATE TABLE t (name TEXT, qty INT)")\ncon.executemany("INSERT INTO t VALUES (?, ?)", [("tea", 2), ("pie", 5), ("tea", 4)])\nprint(con.execute("SELECT name, SUM(qty) FROM t GROUP BY name ORDER BY name").fetchall())', answer: "[('pie', 5), ('tea', 6)]", show: 'sqlgroup', why: T("GROUP BY adds the quantities of each name. ORDER BY puts pie first.", "GROUP BY har bir nomning miqdorini qo'shadi. ORDER BY pie ni birinchi qo'yadi.") },
+      { id: 'p2', type: 'predict', code: 'import pandas as pd\ndf = pd.DataFrame({"city": ["A", "B", "A"], "temp": [10, 30, 20]})\nprint(df[df["temp"] > 15]["city"].tolist())', answer: "['B', 'A']", show: 'warm', why: T("Only temperatures above 15 stay, so their cities are B and A.", "Faqat 15 dan yuqori haroratlar qoladi, ularning shaharlari B va A.") },
+      { id: 'p3', type: 'predict', code: 'd = {"a": [1]}\ne = d.copy()\ne["a"].append(2)\nprint(d["a"])', answer: '[1, 2]', show: 'shallow', why: T("copy makes a new dictionary, but both still hold the same list.", "copy yangi lug'at yasaydi, lekin ikkalasida ham o'sha bitta ro'yxat turadi.") },
+      { id: 'p4', type: 'predict', code: 'try:\n    [1][5]\nexcept LookupError as error:\n    print(type(error).__name__)', answer: 'IndexError', show: 'caught', why: T("IndexError is a kind of LookupError, so except catches it.", "IndexError LookupError ning bir turi, shuning uchun except uni ushlaydi.") },
     ]},
     { id: 'l2', title: T('Level 2: the broken report (3 points)', '2-bosqich: buzilgan hisobot (3 ball)'), cls: 'c2', items: [
       { id: 'why', type: 'written',

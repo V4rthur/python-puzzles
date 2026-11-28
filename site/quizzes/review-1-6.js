@@ -12,10 +12,10 @@ export default {
       { id: 'w2', type: 'predict', points: 0, code: 'print("Python"[1:4])', answer: 'yth' },
     ]},
     { id: 'l1', title: T('Level 1: read the till (4 points)', "1-bosqich: kassani o'qing (4 ball)"), cls: 'c1', items: [
-      { id: 'p1', type: 'predict', code: 'print(7 / 2, 2 ** 3)', answer: '3.5 8' },
-      { id: 'p2', type: 'predict', code: 's = "  Tea,Coffee "\nprint(s.strip().lower().split(","))', answer: "['tea', 'coffee']" },
-      { id: 'p3', type: 'predict', code: 'a = [10, 20, 30]\nb = a\nb.append(40)\nt = (a[0], len(a))\nprint(t)', answer: '(10, 4)' },
-      { id: 'p4', type: 'predict', code: 'd = {"tea": 2}\nd["tea"] += 1\nd["pie"] = 1\nprint(len(d), d["tea"], len(set("banana")))', answer: '2 3 3' },
+      { id: 'p1', type: 'predict', code: 'print(7 / 2, 2 ** 3)', answer: '3.5 8', show: 'divpow', why: T("/ always gives a float. ** multiplies 2 by itself 3 times.", "/ har doim float beradi. ** 2 ni o'ziga 3 marta ko'paytiradi.") },
+      { id: 'p2', type: 'predict', code: 's = "  Tea,Coffee "\nprint(s.strip().lower().split(","))', answer: "['tea', 'coffee']", show: 'chain', why: T("Each method works on the result of the one before it. split makes a list.", "Har bir metod o'zidan oldingisining natijasi bilan ishlaydi. split ro'yxat yasaydi.") },
+      { id: 'p3', type: 'predict', code: 'a = [10, 20, 30]\nb = a\nb.append(40)\nt = (a[0], len(a))\nprint(t)', answer: '(10, 4)', show: 'alias', why: T("b = a does not copy: appending through b changes a too.", "b = a nusxa olmaydi: b orqali qo'shilgan element a da ham paydo bo'ladi.") },
+      { id: 'p4', type: 'predict', code: 'd = {"tea": 2}\nd["tea"] += 1\nd["pie"] = 1\nprint(len(d), d["tea"], len(set("banana")))', answer: '2 3 3', show: 'tally', why: T("d has 2 keys and tea is now 3. A set keeps each letter once: b, a, n.", "d da 2 ta kalit bor, tea esa 3 bo'ldi. To'plam har harfni bir marta saqlaydi: b, a, n.") },
     ]},
     { id: 'l2', title: T('Level 2: the broken labels (3 points)', "2-bosqich: buzilgan yorliqlar (3 ball)"), cls: 'c2', items: [
       { id: 'why', type: 'written',

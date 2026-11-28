@@ -166,7 +166,7 @@ body.home { padding-bottom: 100px; }
 .figure .ghost { opacity: .45; }
 .figure g { transition: transform .8s cubic-bezier(.2, .8, .2, 1), opacity .5s; }
 .figure text { fill: var(--ink); font: 600 15px Consolas, monospace; text-anchor: middle; }
-.figure .dot { fill: var(--go); }
+.figure .dot, .figure text.lit { fill: var(--go); }
 .figure .axis { fill: var(--line); }
 /* `translate` adds to the transform that places each shape, so idle motion never moves it off its spot. */
 .figure .lit { animation: float 3s ease-in-out var(--d, 0s) infinite; }

@@ -109,8 +109,40 @@ export function tower(quiz, done, drop) {
   return canvas(`-110 -${height + 65} 220 ${height + 135}`, ...blocks, ...(ring ? [ring] : []));
 }
 
+// Rows of values from the question: [caption, cells, which cells light up]. The rows light one after another.
+const steps = rows => () => {
+  const longest = pick => Math.max(...rows.flatMap(pick).map(s => s.length));
+  const step = Math.max(46, longest(r => r[1]) * 9 + 14), side = longest(r => [r[0]]) * 9 + 20;
+  const content = side + Math.max(...rows.map(r => r[1].length)) * step, width = Math.max(260, content);
+  const nodes = rows.flatMap(([caption, cells, on], i) => {
+    // Words that would not fit on a cube stand on their own.
+    const long = cells.some(cell => cell.length > 4), x = n => side + step / 2 + n * step;
+    const y = 40 + i * 60, tiles = cells.map((cell, n) => long ? label(x(n), y - 6, cell) : tile(cell, x(n), y));
+    later(500 + i * 700, () => on.forEach(n => lit(tiles[n])));
+    return [label(side / 2, y - 6, caption), ...tiles];
+  });
+  return canvas(`${(content - width) / 2} 0 ${width} ${rows.length * 60 + 4}`, ...nodes);
+};
+
 // Each picture uses the values shown in its question, so it is only revealed after an answer.
 export const EXPLAIN = {
+  // The practice reviews.
+  divpow: steps([["7 / 2", ["3.5"], [0]], ["2 ** 3", ["2", "2", "2"], []], ["=", ["8"], [0]]]),
+  chain: steps([["strip", ["Tea,Coffee"], []], ["lower", ["tea,coffee"], []], ["split", ["tea", "coffee"], [0, 1]]]),
+  alias: steps([["a, b", ["10", "20", "30", "40"], [3]], ["t", ["10", "4"], [0, 1]]]),
+  tally: steps([["d", ["tea:3", "pie:1"], [0, 1]], ["banana", ["b", "a", "n"], [0, 1, 2]]]),
+  varargs: steps([["f(1,2,3)", ["a=1", "2", "3"], [1, 2]], ["f(1,k=5)", ["a=1", "k=5"], [1]]]),
+  csvtext: steps([["age", ["\"20\""], []], ["+ \"1\"", ["201"], [0]]]),
+  emptybox: steps([["len(b)", ["0"], [0]], ["bool(b)", ["False"], [0]]]),
+  common: steps([["banana", ["b", "a", "n", "a", "n", "a"], [1, 3, 5]], ["top", ["a", "3"], [0, 1]]]),
+  dateparts: steps([["date", ["2026", "03", "02"], [1, 2]], ["print", ["3", "2"], [0, 1]]]),
+  sqlsum: steps([["x", ["2", "3"], []], ["SUM", ["5"], [0]]]),
+  columns: steps([["row 0", ["1", "2"], []], ["row 1", ["3", "4"], []], ["axis=0", ["4", "6"], [0, 1]]]),
+  groupsum: steps([["x", ["1", "3"], []], ["y", ["2"], []], ["sum", ["x:4", "y:2"], [0, 1]]]),
+  sqlgroup: steps([["pie", ["5"], []], ["tea", ["2", "4"], []], ["SUM", ["pie:5", "tea:6"], [0, 1]]]),
+  warm: steps([["temp", ["10", "30", "20"], [1, 2]], ["city", ["A", "B", "A"], [1, 2]]]),
+  shallow: steps([["d[\"a\"]", ["1", "2"], [1]], ["e[\"a\"]", ["1", "2"], [1]]]),
+  caught: steps([["raised", ["IndexError"], [0]], ["except", ["LookupError"], []]]),
   bars() { // ax.bar(["a", "b", "c"], [3, 5, 2])
     const columns = [3, 5, 2].map((value, i) => {
       const x = i * 56 - 56, bar = S('g', {}, move(box(34, 34, 4), x, -x, 0));

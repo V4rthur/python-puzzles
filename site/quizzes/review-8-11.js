@@ -20,10 +20,10 @@ export default {
       { id: 'w2', type: 'predict', points: 0, code: 'import csv\nprint(list(csv.reader(["a,b"])))', answer: "[['a', 'b']]" },
     ]},
     { id: 'l1', title: T('Level 1: remember the tools (4 points)', "1-bosqich: vositalarni eslang (4 ball)"), cls: 'c1', items: [
-      { id: 'p1', type: 'predict', code: 'def f(a, *rest, k=1):\n    return len(rest) + k\nprint(f(1, 2, 3), f(1, k=5))', answer: '3 5' },
-      { id: 'p2', type: 'predict', code: 'import csv, io\ntext = io.StringIO("name,age\\nAli,20\\n")\nrows = list(csv.DictReader(text))\nprint(rows[0]["age"] + "1")', answer: '201' },
-      { id: 'p3', type: 'predict', code: 'class Box:\n    def __len__(self):\n        return 0\nb = Box()\nprint(len(b), bool(b))', answer: '0 False' },
-      { id: 'p4', type: 'predict', code: 'from collections import Counter\nprint(Counter("banana").most_common(1))', answer: "[('a', 3)]" },
+      { id: 'p1', type: 'predict', code: 'def f(a, *rest, k=1):\n    return len(rest) + k\nprint(f(1, 2, 3), f(1, k=5))', answer: '3 5', show: 'varargs', why: T("The result is len(rest) + k: 2 + 1 = 3, then 0 + 5 = 5.", "Natija len(rest) + k: avval 2 + 1 = 3, keyin 0 + 5 = 5.") },
+      { id: 'p2', type: 'predict', code: 'import csv, io\ntext = io.StringIO("name,age\\nAli,20\\n")\nrows = list(csv.DictReader(text))\nprint(rows[0]["age"] + "1")', answer: '201', show: 'csvtext', why: T("CSV values are text, so + joins them.", "CSV qiymatlari matn, shuning uchun + ularni ulaydi.") },
+      { id: 'p3', type: 'predict', code: 'class Box:\n    def __len__(self):\n        return 0\nb = Box()\nprint(len(b), bool(b))', answer: '0 False', show: 'emptybox', why: T("bool uses __len__: a length of 0 means False.", "bool __len__ dan foydalanadi: uzunlik 0 bo'lsa, False.") },
+      { id: 'p4', type: 'predict', code: 'from collections import Counter\nprint(Counter("banana").most_common(1))', answer: "[('a', 3)]", show: 'common', why: T("a appears 3 times, more than any other letter.", "a 3 marta uchraydi, boshqa harflardan ko'p.") },
     ]},
     { id: 'l2', title: T('Level 2: the broken handler (3 points)', '2-bosqich: buzilgan fayl boshqaruvchisi (3 ball)'), cls: 'c2', items: [
       { id: 'why', type: 'written',

@@ -32,6 +32,12 @@ const resultOf = (s, item) => {
 // First non-null result of one question; `sorted` must be in time order.
 const firstResult = (sorted, item) => sorted.map(s => resultOf(s, item)).find(r => r != null);
 
+// Questions checked at least once that never got full points. Unchecked code (a null result) is not a miss.
+export function missed(quiz, subs) {
+  const got = earned(quiz, subs);
+  return autoItems(quiz).filter(q => !got.has(q.id) && subs.some(s => s.part === q.part && resultOf(s, q) !== null)).map(q => q.id);
+}
+
 // `subs`: one student's submissions for this quiz only.
 export function summarize(quiz, subs) {
   const sorted = byTime(subs), items = autoItems(quiz), levels = scoredParts(quiz);

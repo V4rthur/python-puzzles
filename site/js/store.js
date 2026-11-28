@@ -1,4 +1,4 @@
-import { autoMax, nameKey, summarize } from './core.js';
+import { autoMax, missed, nameKey, summarize } from './core.js';
 
 const STUDENT = 'pz:student';
 
@@ -31,11 +31,26 @@ export function createStore(storage) {
       const key = keyFor(quizId);
       return key ? write(key, data) : false;
     },
+    // The questions of the current retry run. No quiz id starts with '~'.
+    saveRun(items) {
+      const key = keyFor('~retry');
+      return key ? write(key, items) : false;
+    },
+    loadRun() {
+      const key = keyFor('~retry'), items = key ? read(key) : null;
+      return Array.isArray(items) ? items.filter(i => typeof i?.quiz === 'string' && typeof i.qid === 'string') : [];
+    },
   };
 }
 
 export const storage = (() => { try { return globalThis.localStorage ?? null; } catch { return null; } })();
-export const { getStudent, setStudent, clearStudent, load, save } = createStore(storage);
+export const { getStudent, setStudent, clearStudent, load, save, saveRun, loadRun } = createStore(storage);
+
+// Every missed question, oldest lesson first. `quizzes`: loaded quiz objects by id.
+export const retryList = (lessons, quizzes, loadData) => lessons.filter(l => quizzes[l.quiz])
+  .flatMap(l => missed(quizzes[l.quiz], loadData(l.quiz).subs).map(qid => ({ quiz: l.quiz, qid })));
+
+export const retryUrl = item => `lesson.html?q=${item.quiz}&retry=1#${item.qid}`;
 
 // One row per lesson for the home page. `quizzes`: loaded quiz objects by id.
 export function progressRows(lessons, quizzes, loadData) {

@@ -2,7 +2,7 @@ import { LESSONS, loadQuizzes } from './lessons.js';
 import { isFilled, pointsOf, levelState, summarize, autoMax, earned } from './core.js';
 import { tower, EXPLAIN } from './figures.js';
 import { createRunner, checkPart, runCode } from './checker.js';
-import { storage, getStudent, load, save, progressRows, continueTarget } from './store.js';
+import { storage, getStudent, load, save, progressRows, continueTarget, loadRun, retryUrl } from './store.js';
 import { T, el, tx, tabLabel, indentAfter, makeId, startSync, tooLong, heading, panelState, panelText, towersBuilt, fill, CODE_KEYS, typeKey } from './ui.js';
 
 const UI = {
@@ -13,6 +13,8 @@ const UI = {
   complete: T('Tower complete', 'Minora tayyor'), missing: T('The faint blocks are still missing.', 'Xira bloklar hali yetishmayapti.'),
   all: T('Every block is in place.', 'Hamma bloklar joyida.'), back: T('Back to lessons', 'Darslarga qaytish'),
   lessons: T('All lessons', 'Barcha darslar'),
+  retry: T('Retry', 'Takrorlash'), result: T('See result', "Natijani ko'rish"),
+  rest: T('The rest stay on your retry list.', "Qolganlari takrorlash ro'yxatida qoladi."),
   run: T('Run', 'Ishga tushirish'),
   running: T('Running… Python takes a few seconds to load the first time.', 'Ishlamoqda… Birinchi marta Python yuklanishi bir necha soniya oladi.'),
   checking: T('Checking… Code needs Python, which takes a few seconds to load the first time.',
@@ -27,7 +29,7 @@ const UI = {
     "Dars yuklanmadi. Internetni tekshirib, sahifani qayta yuklang."),
 };
 const $ = id => document.getElementById(id);
-const id = new URLSearchParams(location.search).get('q');
+const params = new URLSearchParams(location.search), id = params.get('q');
 const student = getStudent();
 const home = () => location.replace('./');
 
@@ -67,6 +69,12 @@ async function start() {
   const questions = quiz.parts.flatMap(part => part.items.map(q => ({ part, q })));
   const scored = questions.filter(({ part, q }) => part.id !== 'warmup' && q.type !== 'written' && pointsOf(q) > 0);
   const built = () => earned(quiz, load(id).subs);
+  // A retry run walks through missed questions, which may be in several lessons.
+  const queue = params.has('retry') ? loadRun() : [];
+  const here = queue.filter(i => i.quiz === id && questions.some(({ q }) => q.id === i.qid));
+  const retrying = here.length > 0;
+  const place = qid => queue.findIndex(i => i.quiz === id && i.qid === qid);
+  $('steps-bar').hidden = retrying;
 
   const panels = questions.map(({ part, q }, index) => {
     const step = el('button', { type: 'button' });
@@ -103,7 +111,13 @@ async function start() {
     const check = tx(el('button', { type: 'button', className: 'go check' }), UI.check);
     const why = tx(el('button', { type: 'button', hidden: true }), UI.why);
     const next = tx(el('button', { type: 'button', className: 'next' }), index === questions.length - 1 ? UI.finish : UI.next);
-    next.onclick = () => { location.hash = questions[index + 1]?.q.id ?? 'done'; };
+    next.onclick = () => {
+      if (!retrying) return void (location.hash = questions[index + 1]?.q.id ?? 'done');
+      const item = queue[place(q.id) + 1];
+      if (!item) location.hash = 'retried';
+      else if (item.quiz === id) location.hash = item.qid;
+      else location.href = retryUrl(item);
+    };
     checks.push(check);
     // The one green button: Check while answering, then Next or Try again.
     const main = button => [check, next, again].forEach(b => b.classList.toggle('go', b === button));
@@ -134,7 +148,7 @@ async function start() {
     // Text goes to the centre: before Safari 14.1 'nearest' leaves it behind the sticky buttons.
     const reveal = (node, block = 'center') => { if (innerWidth < 900) node.scrollIntoView({ block }); };
 
-    const panel = { part, q, step, section, art, box, solved, revealed: false };
+    const panel = { part, q, step, section, art, box, next, solved, revealed: false };
     const explain = () => {
       panel.revealed = true;
       why.hidden = true;
@@ -282,24 +296,47 @@ async function start() {
     choices.prepend(button(T(`Next lesson: ${row.title.en}`, `Keyingi dars: ${row.title.uz}`), `lesson.html?q=${row.quiz}`, 'go'));
   };
 
+  const retryResult = async () => {
+    fill(finish);
+    const quizzes = await loadQuizzes();
+    if (location.hash !== '#retried') return;
+    const fixed = queue.filter(i => quizzes[i.quiz] && earned(quizzes[i.quiz], load(i.quiz).subs).has(i.qid)).length;
+    const back = tx(el('button', { type: 'button', className: 'go' }), UI.lessons);
+    back.onclick = () => { location.href = './'; };
+    fill(finish, tx(el('h2'), T(`You fixed ${fixed} of ${queue.length}`, `${queue.length} tadan ${fixed} tasini tuzatdingiz`)),
+      ...(fixed < queue.length ? [tx(el('p'), UI.rest)] : []), back);
+  };
+
   // The open question is kept in the address, so a reload stays on it.
   const show = () => {
-    const ended = location.hash === '#done';
-    const open = ended ? null : panels.find(p => `#${p.q.id}` === location.hash) ?? panels[0];
+    const retried = retrying && location.hash === '#retried';
+    const ended = retried || location.hash === '#done';
+    const asked = panels.find(p => `#${p.q.id}` === location.hash);
+    // A retry run only opens its own questions.
+    const open = ended ? null : retrying ? panels.find(p => p.q.id === (asked && place(asked.q.id) >= 0 ? asked.q.id : here[0].qid))
+      : asked ?? panels[0];
     for (const p of panels) {
       p.section.hidden = p !== open;
       if (p === open) p.step.setAttribute('aria-current', 'step');
       else p.step.removeAttribute('aria-current');
     }
     finish.hidden = !ended;
-    intro.hidden = open !== panels[0];
+    intro.hidden = retrying || open !== panels[0];
     paint();
+    if (retried) {
+      tx(crumb, UI.retry);
+      return retryResult();
+    }
     if (ended) {
       tx(crumb, quiz.title);
       return finishScreen();
     }
     const { part } = open;
-    tx(crumb, T(`${quiz.title.en} · ${part.title.en}`, `${quiz.title.uz} · ${part.title.uz}`));
+    if (retrying) {
+      const at = place(open.q.id) + 1;
+      tx(crumb, T(`Retry ${at} of ${queue.length} · ${quiz.title.en}`, `Takrorlash ${at}/${queue.length} · ${quiz.title.uz}`));
+      tx(open.next, at === queue.length ? UI.result : UI.next);
+    } else tx(crumb, T(`${quiz.title.en} · ${part.title.en}`, `${quiz.title.uz} · ${part.title.uz}`));
     if (built().has(open.q.id) || open.box.matches('.right, .saved')) open.solved();
     if (!open.revealed) fill(open.art, tower(quiz, built()));
   };

@@ -153,6 +153,8 @@ body.home { padding-bottom: 100px; }
   .home .cols > div:first-child { position: -webkit-sticky; position: sticky; top: 16px; }
 }
 
+.retry { display: block; width: 100%; margin: 0 0 20px; }
+
 /* Isometric drawings (figures.js) */
 .figure { display: block; width: 100%; height: auto; position: relative; z-index: 1001; overflow: visible; }
 .figure .f { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linejoin: round; transition: fill .4s; }

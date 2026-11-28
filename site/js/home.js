@@ -1,6 +1,6 @@
 import { LESSONS, loadQuizzes } from './lessons.js';
 import { checkGroup } from './api.js';
-import { storage, getStudent, setStudent, clearStudent, load, progressRows, continueTarget } from './store.js';
+import { storage, getStudent, setStudent, clearStudent, load, progressRows, continueTarget, retryList, retryUrl, saveRun } from './store.js';
 import { cover, tower, connector } from './figures.js';
 import { T, el, tx, configured, NOT_CONFIGURED, startSync, towersBuilt } from './ui.js';
 
@@ -101,12 +101,17 @@ function lessonList(student, loaded, heading) {
     el('li', {}, el('div', { className: 'soon' }, tx(el('span'), title(row)), tx(el('span', { className: 'info' }), STATES.soon)))));
   const bar = el('progress', { max: total, value: done });
   bar.setAttribute('aria-label', 'Progress / Natija');
+  const misses = retryList(LESSONS, loaded, load);
+  // Quiet: Continue stays the one green button.
+  const retry = tx(el('button', { type: 'button', className: 'retry' }),
+    T(`Retry ${misses.length} missed`, `Xatolarni takrorlash (${misses.length})`));
+  retry.onclick = () => { if (saveRun(misses)) location.href = retryUrl(misses[0]); };
   return el('div', {},
     el('p', { className: 'who' }, el('strong', { textContent: student.name }), ` · ${student.code} `, out),
     el('div', { className: 'cols' },
       el('div', {}, heading, ...(next ? [next] : []),
         tx(el('p', { className: 'progress' }), towersBuilt(done, total)),
-        bar),
+        bar, ...(misses.length ? [retry] : [])),
       el('div', {}, path, ...(soon.childElementCount ? [tx(el('h2'), T('Coming soon', 'Tez orada')), soon] : []))));
 }
 

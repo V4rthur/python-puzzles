@@ -24,7 +24,7 @@ export const LESSONS = [
   L(21, 'Practice', 'Amaliyot', 'review-13-20'),
   L(22, 'Pandas(Combining Objects)', 'Pandas (obyektlarni birlashtirish)', 'lesson-22'),
   L(23, 'Matplotlib(NumPy+pandas)', 'Matplotlib (NumPy + pandas)', 'lesson-23'),
-  L(24, 'Overall Practice', 'Umumiy amaliyot', 'review-all'),
+  L(24, 'Overall Practice', 'Umumiy amaliyot', 'review-all-v2'),
 ];
 
 // Every puzzle by id; a file that fails to load is null, which only costs its lesson the score.
